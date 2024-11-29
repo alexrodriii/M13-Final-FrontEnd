@@ -77,5 +77,13 @@ fun BottomNavigationBar(
         ) {
             Text("Home")
         }
+        Button(
+            onClick = { onScreenSelected("List Nurse") }, enabled = currentScreen != "List Nurse"
+        ) {
+            Text("List Nurse")
+        }
+    }
+    when (currentScreen) {
+        "List Nurse" -> ListNurseScreen()
     }
 }
