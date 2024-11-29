@@ -61,7 +61,6 @@ fun MyAppHomePage() {
             onScreenSelected = { selectedScreen -> nextScreen = selectedScreen })
     }
 }
-
 @Composable
 fun BottomNavigationBar(
     currentScreen: String, onScreenSelected: (String) -> Unit, modifier: Modifier = Modifier
@@ -77,5 +76,12 @@ fun BottomNavigationBar(
         ) {
             Text("Home")
         }
+        Button(
+            onClick = { onScreenSelected("Login") }, enabled = currentScreen != "Login"
+        ) {
+            Text("Login")
+        }
+
     }
+    when (currentScreen) {    "Login" -> HospitalLoginScreen()}
 }
