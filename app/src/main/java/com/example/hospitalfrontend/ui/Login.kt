@@ -17,9 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hospitalfrontend.R
 
+//This function is only for the image
 @Composable
 fun Image(
 ) {
@@ -30,9 +32,10 @@ fun Image(
     )
 }
 
-
+@Preview
 @Composable
 fun HospitalLoginScreen() {
+    //Create a variable bool that I'll use
     val showLoginScreen = rememberSaveable() {
         mutableStateOf(true)
     }
@@ -43,6 +46,7 @@ fun HospitalLoginScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            //If teh nurse login, a new account isn't created
             if (showLoginScreen.value) {
                 Image()
                 Text(text = "Login")
@@ -52,6 +56,7 @@ fun HospitalLoginScreen() {
                     //When we click on 'Login' in the logcat it shows us a message
                     Log.d("Nurse", "Login with $email and $password")
                 }
+                //If the nurse register, a new account is created
             } else {
                 Text(text = "Register")
                 UserForm(
@@ -67,8 +72,12 @@ fun HospitalLoginScreen() {
 //OptIn(ExperimentalComposeUiAppi::class)
 @Composable
 fun UserForm(
-    isCreateAccount: Boolean = false, onDone: (String, String) -> Unit = { email, pwd -> }
+    //bool variable if the nurse creates a new account or not
+    isCreateAccount: Boolean = false,
+    //Once the nurse introduces her email and password the onDone will do a callback.
+    onDone: (String, String) -> Unit = { email, pwd -> }
 ) {
+    //Create variables for the form
     val email = rememberSaveable {
         mutableStateOf("")
     }
@@ -79,10 +88,10 @@ fun UserForm(
     val passwordVisible = rememberSaveable {
         mutableStateOf(false)
     }
-    //val isValid = remember { mutableStateOf(false) }
+
     //To hide the login button
     val isValid = rememberSaveable(email.value, password.value) {
-        //trims() to remove the blank space and .isNotEmpty for that isn't empty
+        //trims() to remove the white space and .isNotEmpty for that isn't empty
         email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
     }
     //message
@@ -93,15 +102,21 @@ fun UserForm(
     val mContext = LocalContext.current
     //To hide a keyboard
     val keyboardController = LocalSoftwareKeyboardController.current
+    //I used the column so that the text fields are aligned
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        //The text field email
         EmailInput(
             emailState = email
         )
+        //The text field password
         PasswordInput(
-            passwordState = password, labelId = "Password", passwordVisible = passwordVisible
+            passwordState = password,
+            labelId = "Password",
+            passwordVisible = passwordVisible
         )
         SubmitButton(
-            textId = if (isCreateAccount) "Create account" else "Login", inputValido = isValid
+            textId = if (isCreateAccount) "Create account" else "Login",
+            inputValido = isValid
         ) {
             //To hide the login button
             onDone(email.value.trim(), password.value.trim())
@@ -134,13 +149,17 @@ fun SubmitButton(
 ) {
     Button(
         onClick = onClic,
-        //Form the input login
+        //Design the input login
         modifier = Modifier
             .padding(3.dp)
-            .fillMaxWidth(), shape = CircleShape, enabled = inputValido
+            .fillMaxWidth(),
+            //The border radius
+            shape = CircleShape,
+            enabled = inputValido
     ) {
         Text(
-            text = textId, modifier = Modifier.padding(
+            text = textId,
+            modifier = Modifier.padding(
                 (5.dp)
             )
         )
@@ -149,8 +168,10 @@ fun SubmitButton(
 
 @Composable
 fun PasswordInput(
-    passwordState: MutableState<String>, labelId: String, passwordVisible: MutableState<Boolean>
-) {
+    passwordState: MutableState<String>,
+    labelId: String,
+    passwordVisible: MutableState<Boolean>
+){
     //If the value password is  true then the password is visible
     val visualTransformation = if (passwordVisible.value) VisualTransformation.None
     //If the value password is false the the password is invisible
@@ -173,7 +194,6 @@ fun PasswordInput(
                 PasswordVisibleIcon(passwordVisible)
             } else null
         }
-
     )
 }
 
@@ -181,7 +201,9 @@ fun PasswordInput(
 fun PasswordVisibleIcon(
     passwordVisible: MutableState<Boolean>
 ) {
-    val image = if (passwordVisible.value) Icons.Default.VisibilityOff
+    //The icon show it eye open or eye close
+    val image = if (passwordVisible.value)
+        Icons.Default.VisibilityOff
     else Icons.Default.Visibility
     //When we write the password we can see the icon
     IconButton(onClick = {
@@ -194,15 +216,24 @@ fun PasswordVisibleIcon(
     }
 }
 
+//This function is of the text field email
 @Composable
 fun EmailInput(
-    emailState: MutableState<String>, labelId: String = "Email"
+    emailState: MutableState<String>,
+    //I used labelId so that there is a label that puts email in its text field.
+    labelId: String = "Email"
 ) {
+    // I have created this function so that I can create other non-email fields later.
     InputField(
-        valueState = emailState, labelId = labelId, keyboardType = KeyboardType.Email
+        valueState = emailState,
+        labelId = labelId,
+        /*I have created this variable so that the
+        @ sign appears when the nurse enters her e-mail.*/
+        keyboardType = KeyboardType.Email
     )
 }
 
+//This function is for the layout of the texts fields.
 @Composable
 fun InputField(
     valueState: MutableState<String>,
