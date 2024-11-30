@@ -125,12 +125,12 @@ fun UserForm(
             val emailPattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
             val passwordPattern = Regex("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")
 
-            if (email.value.isNotEmpty()
-                && password.value.isNotEmpty()
+            if (email.value == "admin@gmail.com"
+                && password.value == "Admin^04"
                 && emailPattern.matches(email.value)
                 && passwordPattern.matches(password.value)
             ) {
-                if (email.value == "admin@gmail.com" && password.value == "admin^04") {
+                if (email.value == "admin@gmail.com" && password.value == "Admin^04") {
                     Toast.makeText(mContext, "Successfully Login", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(mContext, "Error Login", Toast.LENGTH_SHORT).show()
