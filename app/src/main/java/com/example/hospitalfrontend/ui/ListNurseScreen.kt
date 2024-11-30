@@ -1,4 +1,4 @@
-package com.example.hospitalfrontend
+package com.example.hospitalfrontend.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
