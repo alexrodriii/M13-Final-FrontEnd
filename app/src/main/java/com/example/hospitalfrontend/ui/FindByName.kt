@@ -1,4 +1,4 @@
-package com.example.hospitalfrontend.ui.theme
+package com.example.hospitalfrontend.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 
 class FindByName : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
