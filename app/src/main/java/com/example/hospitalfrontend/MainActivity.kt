@@ -4,30 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.hospitalfrontend.ui.theme.FindScreen
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
 import com.example.hospitalfrontend.ui.*
 
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
@@ -90,23 +73,20 @@ fun BottomNavigationBar(
         ) {
             Text("Find")
         }
-    }
-    when (currentScreen) {
-        "Find" -> FindScreen()
-
+        Button(
+            onClick = { onScreenSelected("List") }, enabled = currentScreen != "List"
+        ) {
+            Text("List")
+        }
+        Button(
             onClick = { onScreenSelected("Login") }, enabled = currentScreen != "Login"
         ) {
             Text("Login")
         }
-        Button(
-            onClick = { onScreenSelected("List Nurse") }, enabled = currentScreen != "List Nurse"
-        ) {
-            Text("List Nurse")
-        }
     }
     when (currentScreen) {
-        "List Nurse" -> ListNurseScreen()
+        "List" -> ListNurseScreen()
         "Login" -> HospitalLoginScreen()
-
+        "Find" -> FindScreen()
     }
 }
