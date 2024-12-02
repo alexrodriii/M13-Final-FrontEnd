@@ -77,5 +77,13 @@ fun BottomNavigationBar(
         ) {
             Text("Home")
         }
+        Button(
+            onClick = { onScreenSelected("Find") }, enabled = currentScreen != "Find"
+        ) {
+            Text("Find")
+        }
+    }
+    when (currentScreen) {
+        "Find" -> FindScreen()
     }
 }
