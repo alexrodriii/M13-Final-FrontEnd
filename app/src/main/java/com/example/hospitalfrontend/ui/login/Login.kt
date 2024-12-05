@@ -1,4 +1,4 @@
-package com.example.hospitalfrontend.ui
+package com.example.hospitalfrontend.ui.login
 
 import android.util.Log
 import android.widget.Toast
