@@ -1,4 +1,4 @@
-package com.example.hospitalfrontend.ui
+package com.example.hospitalfrontend.ui.login
 
 import android.util.Log
 import android.widget.Toast
@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
