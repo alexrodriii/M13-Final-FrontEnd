@@ -1,4 +1,4 @@
-package com.example.hospitalfrontend.ui
+package com.example.hospitalfrontend.ui.nurses.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
