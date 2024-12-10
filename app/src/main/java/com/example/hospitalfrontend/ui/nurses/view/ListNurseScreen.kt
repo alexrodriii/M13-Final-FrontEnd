@@ -53,6 +53,7 @@ fun NurseListItem(nurse: Nurse) {
                 Text(text = "Name: ${nurse.name}")
                 Text(text = "Surname: ${nurse.surname}")
                 Text(text = "Age: ${nurse.age}")
+                Text(text = "Email: ${nurse.email}")
                 Text(text = "Speciality: ${nurse.speciality}")
                 Text(text = "Password: ${"*".repeat(nurse.password.length)}")
             }

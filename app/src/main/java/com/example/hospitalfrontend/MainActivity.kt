@@ -8,12 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import com.example.hospitalfrontend.ui.login.*
 import com.example.hospitalfrontend.ui.nurses.view.*
-
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
@@ -29,7 +30,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Preview
 @Preview(showBackground = true)
 @Composable
 fun HomePage() {
@@ -44,59 +44,80 @@ fun HomePage() {
 fun MyAppHomePage(nurseViewModel: NurseViewModel) {
     var nextScreen by rememberSaveable { mutableStateOf("Home") }
 
-    Column(
+    Box(
         modifier = Modifier
-            .padding(start = 10.dp, top = 10.dp, bottom = 10.dp)
-            .fillMaxHeight()
-            .fillMaxWidth()
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        // Put the navigation screen static
-        BottomNavigationBar(
-            currentScreen = nextScreen,
-            onScreenSelected = { selectedScreen -> nextScreen = selectedScreen },
-            nurseViewModel = nurseViewModel
-        )
+        if (nextScreen == "Home") {
+            HomeScreen { selectedScreen -> nextScreen = selectedScreen }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Button "Back" with margin
+                Button(
+                    onClick = { nextScreen = "Home" },
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(8.dp)
+                ) {
+                    Text("Back")
+                }
+
+                // Content of the application selected
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    when (nextScreen) {
+                        "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
+                        "Login" -> HospitalLoginScreen()
+                        "Find" -> FindScreen()
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun BottomNavigationBar(
-    currentScreen: String,
-    onScreenSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    nurseViewModel: NurseViewModel
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        Button(
-            onClick = { onScreenSelected("Home") }, enabled = currentScreen != "Home"
-        ) {
-            Text("Home")
-        }
-        Button(
+fun HomeScreen(onScreenSelected: (String) -> Unit) {
+    val options = listOf("Find", "List", "Login") // Options of navigation
 
-            onClick = { onScreenSelected("Find") }, enabled = currentScreen != "Find"
-        ) {
-            Text("Find")
-        }
-        Button(
-            onClick = { onScreenSelected("List") }, enabled = currentScreen != "List"
-        ) {
-            Text("List")
-        }
-        Button(
-            onClick = { onScreenSelected("Login") }, enabled = currentScreen != "Login"
-        ) {
-            Text("Login")
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Add the Logo of Hospital
+        androidx.compose.foundation.Image(
+            painter = painterResource(id = R.drawable.logo_hospital),
+            contentDescription = "Logo Hospital"
+        )
+        // Add a text
+        Text(
+            text = "Hospital Menu",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 10.dp)
+        )
+
+        // Create the different buttons dynamic
+        options.forEach { option ->
+            ButtonMenuHome(onScreenSelected = { onScreenSelected(option) }, textButton = option)
         }
     }
-    when (currentScreen) {
-        "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
-        "Login" -> HospitalLoginScreen()
-        "Find" -> FindScreen()
+}
+
+@Composable
+fun ButtonMenuHome(onScreenSelected: () -> Unit, textButton: String) {
+    Button(
+        onClick = onScreenSelected, modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .padding(8.dp)
+    ) {
+        Text(textButton)
     }
 }
