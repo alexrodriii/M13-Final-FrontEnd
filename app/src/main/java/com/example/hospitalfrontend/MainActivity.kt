@@ -11,10 +11,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
-import com.example.hospitalfrontend.ui.*
-import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
-
+import com.example.hospitalfrontend.ui.login.*
+import com.example.hospitalfrontend.ui.nurses.view.*
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
+import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HospitalFrontEndTheme {
-                MyAppHomePage()
+                MyAppHomePage(nurseViewModel = NurseViewModel())
             }
         }
     }
@@ -33,12 +33,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomePage() {
     HospitalFrontEndTheme {
-        MyAppHomePage()
+        MyAppHomePage(
+            nurseViewModel = NurseViewModel()
+        )
     }
 }
 
 @Composable
-fun MyAppHomePage() {
+fun MyAppHomePage(nurseViewModel: NurseViewModel) {
     var nextScreen by rememberSaveable { mutableStateOf("Home") }
 
     Column(
@@ -48,14 +50,20 @@ fun MyAppHomePage() {
             .fillMaxWidth()
     ) {
         // Put the navigation screen static
-        BottomNavigationBar(currentScreen = nextScreen,
-            onScreenSelected = { selectedScreen -> nextScreen = selectedScreen })
+        BottomNavigationBar(
+            currentScreen = nextScreen,
+            onScreenSelected = { selectedScreen -> nextScreen = selectedScreen },
+            nurseViewModel = nurseViewModel
+        )
     }
 }
 
 @Composable
 fun BottomNavigationBar(
-    currentScreen: String, onScreenSelected: (String) -> Unit, modifier: Modifier = Modifier
+    currentScreen: String,
+    onScreenSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    nurseViewModel: NurseViewModel
 ) {
     Row(
         modifier = modifier
@@ -86,7 +94,7 @@ fun BottomNavigationBar(
         }
     }
     when (currentScreen) {
-        "List" -> ListNurseScreen()
+        "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
         "Login" -> HospitalLoginScreen()
         "Find" -> FindScreen()
     }
