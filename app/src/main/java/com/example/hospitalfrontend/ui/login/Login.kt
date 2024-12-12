@@ -20,12 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hospitalfrontend.R
+import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
 
-@Preview
 @Composable
-
-fun HospitalLoginScreen() {
+fun HospitalLoginScreen(loginViewModel: LoginViewModel) {
     val isLoginScreen = rememberSaveable { mutableStateOf(true) }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -80,6 +80,7 @@ fun ToggleLoginRegisterText(isLoginScreen: MutableState<Boolean>) {
         )
     }
 }
+
 //This function is only for the image
 @Composable
 fun Image() {
@@ -89,7 +90,6 @@ fun Image() {
         modifier = Modifier.size(100.dp)
     )
 }
-
 
 
 //OptIn(ExperimentalComposeUiAppi::class)
@@ -277,3 +277,28 @@ fun InputField(
         ),
     )
 }
+
+@Composable
+fun LoginScreen() {
+    val viewModel: LoginViewModel = viewModel()
+    val loginState=viewModel.loginState.collectAsState()
+    if (loginState.value.isLogin) {
+        Login(viewModel)
+    } else {
+        Register(viewModel)
+    }
+}
+
+@Composable
+fun Register(viewModel: LoginViewModel) {
+    Register(viewModel = viewModel)
+}
+
+@Composable
+fun Login(viewModel: LoginViewModel) {
+    HospitalLoginScreen(
+        loginViewModel = viewModel
+    )
+}
+
+

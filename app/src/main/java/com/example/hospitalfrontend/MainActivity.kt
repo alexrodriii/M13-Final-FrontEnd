@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import com.example.hospitalfrontend.ui.login.*
+import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
 import com.example.hospitalfrontend.ui.nurses.view.*
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
@@ -22,7 +23,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HospitalFrontEndTheme {
-                MyAppHomePage(nurseViewModel = NurseViewModel())
+                MyAppHomePage(nurseViewModel = NurseViewModel(),
+                    loginViewModel = LoginViewModel())
             }
         }
     }
@@ -34,13 +36,14 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel()
+            nurseViewModel = NurseViewModel(),
+            loginViewModel = LoginViewModel()
         )
     }
 }
 
 @Composable
-fun MyAppHomePage(nurseViewModel: NurseViewModel) {
+fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel) {
     var nextScreen by rememberSaveable { mutableStateOf("Home") }
 
     Column(
@@ -53,9 +56,13 @@ fun MyAppHomePage(nurseViewModel: NurseViewModel) {
         BottomNavigationBar(
             currentScreen = nextScreen,
             onScreenSelected = { selectedScreen -> nextScreen = selectedScreen },
-            nurseViewModel = nurseViewModel
+            nurseViewModel = nurseViewModel,
+            loginViewModel = loginViewModel,
         )
+        //Boton para el login
+        //Button() { }
     }
+
 }
 
 @Composable
@@ -63,7 +70,8 @@ fun BottomNavigationBar(
     currentScreen: String,
     onScreenSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    nurseViewModel: NurseViewModel
+    nurseViewModel: NurseViewModel,
+    loginViewModel: LoginViewModel
 ) {
     Row(
         modifier = modifier
@@ -95,7 +103,7 @@ fun BottomNavigationBar(
     }
     when (currentScreen) {
         "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
-        "Login" -> HospitalLoginScreen()
+        "Login" -> HospitalLoginScreen(loginViewModel= loginViewModel)
         "Find" -> FindScreen()
     }
 }
