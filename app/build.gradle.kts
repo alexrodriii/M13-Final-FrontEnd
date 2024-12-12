@@ -58,4 +58,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     //Icons extends
     implementation(libs.androidx.material.icons.extended)
+    //ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 }

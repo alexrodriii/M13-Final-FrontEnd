@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HospitalFrontEndTheme {
-                MyAppHomePage(nurseViewModel = NurseViewModel())
+                MyAppHomePage(nurseViewModel = NurseViewModel(), loginViewModel = LoginViewModel())
             }
         }
     }
@@ -35,13 +35,13 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel()
+            nurseViewModel = NurseViewModel(),loginViewModel = LoginViewModel()
         )
     }
 }
 
 @Composable
-fun MyAppHomePage(nurseViewModel: NurseViewModel) {
+fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel) {
     var nextScreen by rememberSaveable { mutableStateOf("Home") }
 
     Box(
@@ -74,7 +74,7 @@ fun MyAppHomePage(nurseViewModel: NurseViewModel) {
                 ) {
                     when (nextScreen) {
                         "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
-                        "Login" -> HospitalLoginScreen()
+                        "Login" -> HospitalLoginScreen(loginViewModel= loginViewModel)
                         "Find" -> FindScreen()
                     }
                 }
