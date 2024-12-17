@@ -2,7 +2,6 @@ package com.example.hospitalfrontend.ui.login.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.example.hospitalfrontend.model.Nurse
-import com.example.hospitalfrontend.ui.nurses.viewmodels.CreateNurseState
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import kotlinx.coroutines.flow.*
 
@@ -15,8 +14,8 @@ class LoginViewModel(private val nurseViewModel: NurseViewModel) : ViewModel() {
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> get() = _loginState.asStateFlow()
 
-    private val _registerState = MutableStateFlow(CreateNurseState())
-    val registerState: StateFlow<CreateNurseState> get() = _registerState.asStateFlow()
+    private val _registerState = MutableStateFlow(LoginState())
+    val registerState: StateFlow<LoginState> get() = _registerState.asStateFlow()
 
     fun setLoginState(isLogin: Boolean) {
         _loginState.update { currentState ->
