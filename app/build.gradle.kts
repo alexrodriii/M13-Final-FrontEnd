@@ -61,5 +61,6 @@ dependencies {
     //Icons extends
     implementation(libs.androidx.material.icons.extended)
     //ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.threetenabp) // Or latest version
 }
