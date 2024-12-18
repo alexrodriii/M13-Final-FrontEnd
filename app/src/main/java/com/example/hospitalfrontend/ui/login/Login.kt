@@ -1,7 +1,8 @@
-package com.example.hospitalfrontend.ui
+package com.example.hospitalfrontend.ui.login
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,55 +20,77 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hospitalfrontend.R
+import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
 
-//This function is only for the image
 @Composable
-fun Image(
-) {
-    androidx.compose.foundation.Image(
-        painter = painterResource(id = R.drawable.login),
-        contentDescription = "Image",
-        modifier = Modifier.size(100.dp)
-    )
-}
-
-@Preview
-@Composable
-fun HospitalLoginScreen() {
-    //Create a variable bool that I'll use
-    val showLoginScreen = rememberSaveable() {
-        mutableStateOf(true)
-    }
-    Surface(
-        modifier = Modifier.fillMaxSize()
-    ) {
+fun HospitalLoginScreen(loginViewModel: LoginViewModel) {
+    val isLoginScreen = rememberSaveable { mutableStateOf(true) }
+    Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            //If teh nurse login, a new account isn't created
-            if (showLoginScreen.value) {
-                Image()
-                Text(text = "Login")
-                UserForm(
-                    isCreateAccount = false
-                ) { email, password ->
-                    //When we click on 'Login' in the logcat it shows us a message
-                    Log.d("Nurse", "Login with $email and $password")
-                }
-                //If the nurse register, a new account is created
-            } else {
-                Text(text = "Register")
-                UserForm(
-                    isCreateAccount = true
-                ) { email, password ->
-                    Log.d("Nurse", "Create account with $email and $password")
-                }
-            }
+            LoginOrRegisterScreen(isLoginScreen)
         }
     }
 }
+
+@Composable
+fun LoginOrRegisterScreen(
+    isLoginScreen: MutableState<Boolean>
+) {
+    if (isLoginScreen.value) {
+        Image()
+        Text(text = "Login")
+        UserForm(isCreateAccount = false) { email, password ->
+            Log.d("Nurse", "Login with $email and $password")
+        }
+    } else {
+        Text(text = "Register")
+        UserForm(isCreateAccount = true) { email, password ->
+            Log.d("Nurse", "Create account with $email and $password")
+        }
+    }
+    Spacer(modifier = Modifier.height(15.dp))
+    ToggleLoginRegisterText(isLoginScreen = isLoginScreen)
+}
+
+@Composable
+fun ToggleLoginRegisterText(isLoginScreen: MutableState<Boolean>) {
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        val text1 =
+            if (isLoginScreen.value) "Don't have an account?"
+            else "Already have an account?"
+        val text2 =
+            if (isLoginScreen.value) "Register"
+            else "Login"
+        Text(text = text1)
+        Text(
+            text = text2,
+            modifier = Modifier
+                .clickable { isLoginScreen.value = !isLoginScreen.value }
+                .padding(start = 5.dp)
+        )
+    }
+}
+
+//This function is only for the image
+@Composable
+fun Image() {
+    androidx.compose.foundation.Image(
+        painter = painterResource(id = R.drawable.login),
+        contentDescription = "Login screen image",
+        modifier = Modifier.size(100.dp)
+    )
+}
+
 
 //OptIn(ExperimentalComposeUiAppi::class)
 @Composable
@@ -153,9 +176,9 @@ fun SubmitButton(
         modifier = Modifier
             .padding(3.dp)
             .fillMaxWidth(),
-            //The border radius
-            shape = CircleShape,
-            enabled = inputValido
+        //The border radius
+        shape = CircleShape,
+        enabled = inputValido
     ) {
         Text(
             text = textId,
@@ -171,7 +194,7 @@ fun PasswordInput(
     passwordState: MutableState<String>,
     labelId: String,
     passwordVisible: MutableState<Boolean>
-){
+) {
     //If the value password is  true then the password is visible
     val visualTransformation = if (passwordVisible.value) VisualTransformation.None
     //If the value password is false the the password is invisible
@@ -254,3 +277,28 @@ fun InputField(
         ),
     )
 }
+
+@Composable
+fun LoginScreen() {
+    val viewModel: LoginViewModel = viewModel()
+    val loginState=viewModel.loginState.collectAsState()
+    if (loginState.value.isLogin) {
+        Login(viewModel)
+    } else {
+        Register(viewModel)
+    }
+}
+
+@Composable
+fun Register(viewModel: LoginViewModel) {
+    Register(viewModel = viewModel)
+}
+
+@Composable
+fun Login(viewModel: LoginViewModel) {
+    HospitalLoginScreen(
+        loginViewModel = viewModel
+    )
+}
+
+
