@@ -149,7 +149,13 @@ fun UserForm(
             nurseViewModel.loginNurse(email.value, password.value)
             if (nurseViewModel.loginState.value.isLogin) {
                 Toast.makeText(mContext, "Successfully Login", Toast.LENGTH_SHORT).show()
-                navController.navigate("home")
+                //This navigates to the "home" screen and removes the "login" page from the back stack.
+                navController.navigate("home") {
+                    // The popUpTo ensures that the "login" page is not accessible via the back button
+                    popUpTo("login") {
+                        inclusive = true
+                    }
+                }
             } else {
                 Toast.makeText(mContext, "Incorrect Email or Password", Toast.LENGTH_SHORT).show()
             }
