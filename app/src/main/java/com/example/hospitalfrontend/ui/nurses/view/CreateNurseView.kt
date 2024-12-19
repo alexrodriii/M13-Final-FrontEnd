@@ -277,8 +277,7 @@ fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close, // Example icon
-                    contentDescription = "More Options",
-                    tint = colorResource(id = colorText)
+                    contentDescription = "More Options", tint = colorResource(id = colorText)
                 )
             }
             Column(modifier = Modifier.fillMaxSize()) {
@@ -356,9 +355,12 @@ fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel
                     )
                     nurseViewModel.addNurse(nurse)
                     Toast.makeText(mContext, "New nurse created", Toast.LENGTH_SHORT).show()
-                    // Navigate back to the home page (or the appropriate page based on login)
+                    //This navigates to the "home" screen and removes the "create" page from the back stack.
                     navController.navigate("home") {
-                        popUpTo("create") { inclusive = true }
+                        // The popUpTo ensures that the "create" page is not accessible via the back button
+                        popUpTo("create") {
+                            inclusive = true
+                        }
                     }
                 }
 
