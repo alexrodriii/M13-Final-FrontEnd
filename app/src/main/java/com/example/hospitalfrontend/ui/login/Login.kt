@@ -1,90 +1,102 @@
 package com.example.hospitalfrontend.ui.login
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.*
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
-import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
+import com.example.hospitalfrontend.R.color.colorText
+import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
+import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
+import com.example.hospitalfrontend.ui.theme.*
 
 @Composable
-fun HospitalLoginScreen(loginViewModel: LoginViewModel) {
-    val isLoginScreen = rememberSaveable { mutableStateOf(true) }
+fun HospitalLoginScreen(
+    nurseViewModel: NurseViewModel, navController: NavController
+) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            LoginOrRegisterScreen(isLoginScreen)
+            LoginOrRegisterScreen(navController, nurseViewModel)
         }
     }
 }
 
 @Composable
 fun LoginOrRegisterScreen(
-    isLoginScreen: MutableState<Boolean>
+    navController: NavController, nurseViewModel: NurseViewModel
 ) {
-    if (isLoginScreen.value) {
-        Image()
-        Text(text = "Login")
-        UserForm(isCreateAccount = false) { email, password ->
-            Log.d("Nurse", "Login with $email and $password")
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image()
+            Text(
+                text = "Login", modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(), style = TextStyle(
+                    fontSize = 30.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal
+                ), color = colorResource(id = colorText), textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            UserForm(nurseViewModel, navController)
         }
-    } else {
-        Text(text = "Register")
-        UserForm(isCreateAccount = true) { email, password ->
-            Log.d("Nurse", "Create account with $email and $password")
+
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp) // Add padding for better visual spacing
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close",
+                tint = colorResource(id = colorText)
+            )
         }
     }
-    Spacer(modifier = Modifier.height(15.dp))
-    ToggleLoginRegisterText(isLoginScreen = isLoginScreen)
 }
 
 @Composable
-fun ToggleLoginRegisterText(isLoginScreen: MutableState<Boolean>) {
+fun ToggleLoginRegisterText(navController: NavController) {
 
     Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
     ) {
-
-        val text1 =
-            if (isLoginScreen.value) "Don't have an account?"
-            else "Already have an account?"
-        val text2 =
-            if (isLoginScreen.value) "Register"
-            else "Login"
-        Text(text = text1)
-        Text(
-            text = text2,
+        Text(text = "Don't have an account?")
+        Text(text = "Register",
             modifier = Modifier
-                .clickable { isLoginScreen.value = !isLoginScreen.value }
-                .padding(start = 5.dp)
-        )
+                .clickable { navController.navigate("create") }
+                .padding(start = 5.dp))
     }
 }
 
 //This function is only for the image
 @Composable
 fun Image() {
-    androidx.compose.foundation.Image(
+    Image(
         painter = painterResource(id = R.drawable.login),
         contentDescription = "Login screen image",
         modifier = Modifier.size(100.dp)
@@ -92,13 +104,9 @@ fun Image() {
 }
 
 
-//OptIn(ExperimentalComposeUiAppi::class)
 @Composable
 fun UserForm(
-    //bool variable if the nurse creates a new account or not
-    isCreateAccount: Boolean = false,
-    //Once the nurse introduces her email and password the onDone will do a callback.
-    onDone: (String, String) -> Unit = { email, pwd -> }
+    nurseViewModel: NurseViewModel, navController: NavController
 ) {
     //Create variables for the form
     val email = rememberSaveable {
@@ -117,15 +125,9 @@ fun UserForm(
         //trims() to remove the white space and .isNotEmpty for that isn't empty
         email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
     }
-    //message
-    var message = remember {
-        mutableStateOf("")
-    }
     //Validate de login
     val mContext = LocalContext.current
-    //To hide a keyboard
-    val keyboardController = LocalSoftwareKeyboardController.current
-    //I used the column so that the text fields are aligned
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         //The text field email
         EmailInput(
@@ -133,34 +135,23 @@ fun UserForm(
         )
         //The text field password
         PasswordInput(
-            passwordState = password,
-            labelId = "Password",
-            passwordVisible = passwordVisible
+            passwordState = password, labelId = "Password", passwordVisible = passwordVisible
         )
-        SubmitButton(
-            textId = if (isCreateAccount) "Create account" else "Login",
-            inputValido = isValid
-        ) {
-            //To hide the login button
-            onDone(email.value.trim(), password.value.trim())
-            //To hide a keyboard
-            keyboardController?.hide()
-            val emailPattern = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
-            val passwordPattern = Regex("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$")
 
-            if (email.value == "admin@gmail.com"
-                && password.value == "Admin^04"
-                && emailPattern.matches(email.value)
-                && passwordPattern.matches(password.value)
-            ) {
-                if (email.value == "admin@gmail.com" && password.value == "Admin^04") {
-                    Toast.makeText(mContext, "Successfully Login", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(mContext, "Error Login", Toast.LENGTH_SHORT).show()
-                }
+        Spacer(modifier = Modifier.height(20.dp))
+        // Go to register screen
+        ToggleLoginRegisterText(navController)
+        Spacer(modifier = Modifier.height(50.dp))
+
+        SubmitButton(
+            textId = "Login", inputValid = isValid
+        ) {
+            nurseViewModel.loginNurse(email.value, password.value)
+            if (nurseViewModel.loginState.value.isLogin) {
+                Toast.makeText(mContext, "Successfully Login", Toast.LENGTH_SHORT).show()
+                navController.navigate("home")
             } else {
-                Toast.makeText(mContext, "Invalid Email or Password Format", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(mContext, "Incorrect Email or Password", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -168,32 +159,37 @@ fun UserForm(
 
 @Composable
 fun SubmitButton(
-    textId: String, inputValido: Boolean, onClic: () -> Unit
+    textId: String, inputValid: Boolean, onClick: () -> Unit
 ) {
     Button(
-        onClick = onClic,
-        //Design the input login
+        onClick = onClick,
         modifier = Modifier
-            .padding(3.dp)
-            .fillMaxWidth(),
-        //The border radius
-        shape = CircleShape,
-        enabled = inputValido
+            .fillMaxWidth()
+            .heightIn(48.dp),
+        enabled = inputValid,
+        contentPadding = PaddingValues(),
+        colors = ButtonDefaults.buttonColors(Color.Transparent)
     ) {
-        Text(
-            text = textId,
-            modifier = Modifier.padding(
-                (5.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(48.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(Secundary, Primary)
+                    ), shape = RoundedCornerShape(50.dp)
+                ), contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = textId, fontSize = 18.sp, fontWeight = FontWeight.Bold
             )
-        )
+        }
     }
 }
 
 @Composable
 fun PasswordInput(
-    passwordState: MutableState<String>,
-    labelId: String,
-    passwordVisible: MutableState<Boolean>
+    passwordState: MutableState<String>, labelId: String, passwordVisible: MutableState<Boolean>
 ) {
     //If the value password is  true then the password is visible
     val visualTransformation = if (passwordVisible.value) VisualTransformation.None
@@ -206,6 +202,12 @@ fun PasswordInput(
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password
         ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Primary,
+            cursorColor = Primary,
+            focusedLabelColor = Primary,
+        ),
         modifier = Modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             .fillMaxWidth(),
@@ -215,9 +217,8 @@ fun PasswordInput(
         trailingIcon = {
             if (passwordState.value.isNotBlank()) {
                 PasswordVisibleIcon(passwordVisible)
-            } else null
-        }
-    )
+            }
+        })
 }
 
 @Composable
@@ -225,8 +226,7 @@ fun PasswordVisibleIcon(
     passwordVisible: MutableState<Boolean>
 ) {
     //The icon show it eye open or eye close
-    val image = if (passwordVisible.value)
-        Icons.Default.VisibilityOff
+    val image = if (passwordVisible.value) Icons.Default.VisibilityOff
     else Icons.Default.Visibility
     //When we write the password we can see the icon
     IconButton(onClick = {
@@ -248,9 +248,7 @@ fun EmailInput(
 ) {
     // I have created this function so that I can create other non-email fields later.
     InputField(
-        valueState = emailState,
-        labelId = labelId,
-        /*I have created this variable so that the
+        valueState = emailState, labelId = labelId,/*I have created this variable so that the
         @ sign appears when the nurse enters her e-mail.*/
         keyboardType = KeyboardType.Email
     )
@@ -272,33 +270,26 @@ fun InputField(
         modifier = Modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             .fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Primary,
+            cursorColor = Primary,
+            focusedLabelColor = Primary,
+        ),
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType
         ),
     )
 }
 
+@Preview(showBackground = true)
 @Composable
-fun LoginScreen() {
-    val viewModel: LoginViewModel = viewModel()
-    val loginState=viewModel.loginState.collectAsState()
-    if (loginState.value.isLogin) {
-        Login(viewModel)
-    } else {
-        Register(viewModel)
+fun PreviewLogin() {
+    val navController = rememberNavController()
+    val nurseViewModel = NurseViewModel()
+
+    HospitalFrontEndTheme {
+        HospitalLoginScreen(nurseViewModel, navController)
     }
 }
-
-@Composable
-fun Register(viewModel: LoginViewModel) {
-    Register(viewModel = viewModel)
-}
-
-@Composable
-fun Login(viewModel: LoginViewModel) {
-    HospitalLoginScreen(
-        loginViewModel = viewModel
-    )
-}
-
 
