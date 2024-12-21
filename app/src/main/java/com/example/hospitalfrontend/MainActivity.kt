@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.example.hospitalfrontend.ui.login.*
+import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
 import com.example.hospitalfrontend.ui.nurses.view.*
+import com.example.hospitalfrontend.ui.nurses.viewmodels.FindByNameViewModel
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
@@ -24,7 +26,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HospitalFrontEndTheme {
-                MyAppHomePage(nurseViewModel = NurseViewModel(), loginViewModel = LoginViewModel())
+                MyAppHomePage(nurseViewModel = NurseViewModel(), loginViewModel = LoginViewModel(), findByNameViewModel = FindByNameViewModel())
             }
         }
     }
@@ -35,13 +37,13 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel(),loginViewModel = LoginViewModel()
+            nurseViewModel = NurseViewModel(),loginViewModel = LoginViewModel(), findByNameViewModel = FindByNameViewModel()
         )
     }
 }
 
 @Composable
-fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel) {
+fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel, findByNameViewModel: FindByNameViewModel) {
     var nextScreen by rememberSaveable { mutableStateOf("Home") }
 
     Box(
@@ -75,7 +77,7 @@ fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel
                     when (nextScreen) {
                         "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
                         "Login" -> HospitalLoginScreen(loginViewModel= loginViewModel)
-                        "Find" -> FindScreen()
+                        "Find" -> FindScreen(viewModel = findByNameViewModel)
                     }
                 }
             }
