@@ -1,7 +1,7 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,22 +13,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.hospitalfrontend.MyAppHomePage
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.R.color.*
 import com.example.hospitalfrontend.model.Nurse
-import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
-import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.*
 
@@ -205,7 +202,8 @@ fun SpecialityDropdown(
             )
         )
 
-        DropdownMenu(expanded = isDropdownExpanded,
+        DropdownMenu(
+            expanded = isDropdownExpanded,
             onDismissRequest = { isDropdownExpanded = false }) {
             specialityList.forEach { speciality ->
                 DropdownMenuItem(text = { Text(speciality) }, onClick = {
@@ -247,7 +245,7 @@ fun ButtonComponent(value: String, enabled: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun CreateNursePage(navController: NavController, loginViewModel: LoginViewModel) {
+fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel) {
     val firstName = rememberSaveable { mutableStateOf("") }
     val lastName = rememberSaveable { mutableStateOf("") }
     val age = rememberSaveable { mutableStateOf("") }
@@ -261,6 +259,11 @@ fun CreateNursePage(navController: NavController, loginViewModel: LoginViewModel
         Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").matches(email.value)
     val specialityList = listOf("Pediatrics", "Cardiology", "Neurology", "Oncology", "Orthopedics")
 
+    fun isFormValid(): Boolean {
+        return firstName.value.isNotEmpty() && lastName.value.isNotEmpty() && age.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && selectedSpeciality.value.isNotEmpty() && isEmailValid // Optionally check if email is valid
+    }
+
+    val mContext = LocalContext.current
 
     Surface(
         modifier = Modifier
@@ -274,8 +277,7 @@ fun CreateNursePage(navController: NavController, loginViewModel: LoginViewModel
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close, // Example icon
-                    contentDescription = "More Options",
-                    tint = colorResource(id = R.color.colorText)
+                    contentDescription = "More Options", tint = colorResource(id = colorText)
                 )
             }
             Column(modifier = Modifier.fillMaxSize()) {
@@ -341,7 +343,7 @@ fun CreateNursePage(navController: NavController, loginViewModel: LoginViewModel
                 Spacer(modifier = Modifier.height(100.dp))
 
                 // Button SignUp
-                ButtonComponent(value = "Register", enabled = true) {
+                ButtonComponent(value = "Register", enabled = isFormValid()) {
                     val nurse = Nurse(
                         id = 0,
                         name = firstName.value,
@@ -351,11 +353,14 @@ fun CreateNursePage(navController: NavController, loginViewModel: LoginViewModel
                         password = password.value,
                         speciality = selectedSpeciality.value
                     )
-
-                    loginViewModel.saveNurse(nurse)
-                    // Navigate back to the home page (or the appropriate page based on login)
+                    nurseViewModel.addNurse(nurse)
+                    Toast.makeText(mContext, "New nurse created", Toast.LENGTH_SHORT).show()
+                    //This navigates to the "home" screen and removes the "create" page from the back stack.
                     navController.navigate("home") {
-                        popUpTo("create") { inclusive = true }
+                        // The popUpTo ensures that the "create" page is not accessible via the back button
+                        popUpTo("create") {
+                            inclusive = true
+                        }
                     }
                 }
 
@@ -369,9 +374,9 @@ fun CreateNursePage(navController: NavController, loginViewModel: LoginViewModel
 @Composable
 fun CreateNursePagePreview() {
     val navController = rememberNavController()
-    val loginViewModel = LoginViewModel(NurseViewModel())
+    val nurseViewModel = NurseViewModel()
 
     HospitalFrontEndTheme {
-        CreateNursePage(navController, loginViewModel)
+        CreateNursePage(navController, nurseViewModel)
     }
 }
