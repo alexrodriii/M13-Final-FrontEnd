@@ -13,12 +13,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import com.example.hospitalfrontend.ui.login.*
+import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
 import com.example.hospitalfrontend.ui.nurses.view.*
+import com.example.hospitalfrontend.ui.nurses.viewmodels.FindByNameViewModel
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
@@ -31,7 +34,11 @@ class MainActivity : ComponentActivity() {
             val nurseViewModel: NurseViewModel = viewModel()
 
             HospitalFrontEndTheme {
+
+                MyAppHomePage(nurseViewModel = NurseViewModel(), loginViewModel = LoginViewModel(), findByNameViewModel = FindByNameViewModel())
+
                 MyAppHomePage(nurseViewModel)
+
             }
         }
     }
@@ -45,12 +52,56 @@ fun HomePage() {
         val nurseViewModel = NurseViewModel()
 
         MyAppHomePage(
+
+            nurseViewModel = NurseViewModel(),loginViewModel = LoginViewModel(), findByNameViewModel = FindByNameViewModel()
+
             nurseViewModel
+
         )
     }
 }
 
 @Composable
+
+fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel, findByNameViewModel: FindByNameViewModel) {
+    var nextScreen by rememberSaveable { mutableStateOf("Home") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        if (nextScreen == "Home") {
+            HomeScreen { selectedScreen -> nextScreen = selectedScreen }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Button "Back" with margin
+                Button(
+                    onClick = { nextScreen = "Home" },
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(8.dp)
+                ) {
+                    Text("Back")
+                }
+
+                // Content of the application selected
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    when (nextScreen) {
+                        "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
+                        "Login" -> HospitalLoginScreen(loginViewModel= loginViewModel)
+                        "Find" -> FindScreen(viewModel = findByNameViewModel)
+                    }
+                }
+            }
+
 fun MyAppHomePage(
     nurseViewModel: NurseViewModel
 ) {
@@ -79,6 +130,7 @@ fun MyAppHomePage(
         }
         composable("create") {
             CreateNursePage(navController = navController, nurseViewModel = nurseViewModel)
+
         }
     }
 }
