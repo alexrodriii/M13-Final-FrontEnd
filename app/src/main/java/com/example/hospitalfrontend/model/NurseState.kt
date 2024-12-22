@@ -1,6 +1,6 @@
 package com.example.hospitalfrontend.model
 
-data class Nurse(
+data class NurseState(
     val id : Int,
     val name: String,
     val surname: String,

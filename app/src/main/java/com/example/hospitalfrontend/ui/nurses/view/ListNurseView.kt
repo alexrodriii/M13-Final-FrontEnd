@@ -1,7 +1,6 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
 import android.util.Log
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.icons.Icons
@@ -16,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
-import com.example.hospitalfrontend.model.Nurse
+import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import org.threeten.bp.*
@@ -60,7 +59,7 @@ fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel
 
 
 @Composable
-fun NurseListItem(nurse: Nurse) {
+fun NurseListItem(nurse: NurseState) {
     val age by remember(nurse.age) { // Calculate age only when nurse.age changes
         mutableIntStateOf(calculateAge(nurse.age))
     }

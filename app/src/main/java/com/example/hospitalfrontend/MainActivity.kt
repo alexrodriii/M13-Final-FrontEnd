@@ -8,36 +8,25 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.*
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import com.example.hospitalfrontend.ui.login.*
-import com.example.hospitalfrontend.ui.login.viewmodels.LoginViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.*
+import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
 import com.example.hospitalfrontend.ui.nurses.view.*
-import com.example.hospitalfrontend.ui.nurses.viewmodels.FindByNameViewModel
-import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
+import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // Use viewModel() to retain ViewModel instances across recompositions
-            val nurseViewModel: NurseViewModel = viewModel()
-
             HospitalFrontEndTheme {
-
-                MyAppHomePage(nurseViewModel = NurseViewModel(), loginViewModel = LoginViewModel(), findByNameViewModel = FindByNameViewModel())
-
-                MyAppHomePage(nurseViewModel)
+                MyAppHomePage(nurseViewModel = NurseViewModel())
 
             }
         }
@@ -49,58 +38,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomePage() {
     HospitalFrontEndTheme {
-        val nurseViewModel = NurseViewModel()
-
         MyAppHomePage(
-
-            nurseViewModel = NurseViewModel(),loginViewModel = LoginViewModel(), findByNameViewModel = FindByNameViewModel()
-
-            nurseViewModel
-
+            nurseViewModel = NurseViewModel()
         )
     }
 }
 
 @Composable
-
-fun MyAppHomePage(nurseViewModel: NurseViewModel, loginViewModel: LoginViewModel, findByNameViewModel: FindByNameViewModel) {
-    var nextScreen by rememberSaveable { mutableStateOf("Home") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        if (nextScreen == "Home") {
-            HomeScreen { selectedScreen -> nextScreen = selectedScreen }
-        } else {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Button "Back" with margin
-                Button(
-                    onClick = { nextScreen = "Home" },
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(8.dp)
-                ) {
-                    Text("Back")
-                }
-
-                // Content of the application selected
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 8.dp),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    when (nextScreen) {
-                        "List" -> ListNurseScreen(nurseViewModel = nurseViewModel)
-                        "Login" -> HospitalLoginScreen(loginViewModel= loginViewModel)
-                        "Find" -> FindScreen(viewModel = findByNameViewModel)
-                    }
-                }
-            }
 
 fun MyAppHomePage(
     nurseViewModel: NurseViewModel

@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.R.color.*
-import com.example.hospitalfrontend.model.Nurse
+import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.*
 
@@ -344,7 +344,7 @@ fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel
 
                 // Button SignUp
                 ButtonComponent(value = "Register", enabled = isFormValid()) {
-                    val nurse = Nurse(
+                    val nurse = NurseState(
                         id = 0,
                         name = firstName.value,
                         surname = lastName.value,
