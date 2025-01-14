@@ -63,4 +63,8 @@ dependencies {
     //ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.threetenabp) // Or latest version
+    // Imports to connect to back-end
+    implementation (libs.retrofit)
+    implementation(libs.okhttp)
+    implementation (libs.converter.gson)
 }
