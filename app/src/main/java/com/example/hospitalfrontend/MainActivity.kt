@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
+import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
 import com.example.hospitalfrontend.ui.nurses.view.*
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
@@ -26,7 +27,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HospitalFrontEndTheme {
-                MyAppHomePage(nurseViewModel = NurseViewModel())
+                MyAppHomePage(
+                    nurseViewModel = NurseViewModel(), remoteViewModel = RemoteViewModel()
+                )
 
             }
         }
@@ -39,7 +42,7 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel()
+            nurseViewModel = NurseViewModel(), remoteViewModel = RemoteViewModel()
         )
     }
 }
@@ -47,7 +50,7 @@ fun HomePage() {
 @Composable
 
 fun MyAppHomePage(
-    nurseViewModel: NurseViewModel
+    nurseViewModel: NurseViewModel, remoteViewModel: RemoteViewModel
 ) {
     // Set up the NavController for navigation
     val navController = rememberNavController()
@@ -78,7 +81,6 @@ fun MyAppHomePage(
         }
     }
 }
-
 
 @Composable
 fun HomeScreen(isLoggedIn: Boolean, navController: NavController, nurseViewModel: NurseViewModel) {
