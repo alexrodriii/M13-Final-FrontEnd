@@ -184,7 +184,8 @@ fun SpecialityDropdown(
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
     Column {
-        OutlinedTextField(value = selectedSpeciality.value,
+        OutlinedTextField(
+            value = selectedSpeciality.value,
             onValueChange = { },
             label = { Text("Speciality") },
             modifier = Modifier.fillMaxWidth(),
@@ -270,101 +271,90 @@ fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel
             .fillMaxSize()
             .padding(28.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) { // Use Box for positioning
-            IconButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.align(Alignment.TopEnd) // Position at top right
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close, // Example icon
-                    contentDescription = "More Options", tint = colorResource(id = colorText)
-                )
+        Column(modifier = Modifier.fillMaxSize()) {
+            NormalTextComponent(value = "Hello there, ")
+            HeadingTextComponent(value = "Create an Account ")
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Name Field
+            MyTextField(
+                labelValue = "First Name",
+                painterResources = painterResource(id = R.drawable.login),
+                textValue = firstName
+            )
+            // Surname Field
+            MyTextField(
+                labelValue = "Last Name",
+                painterResources = painterResource(id = R.drawable.login),
+                textValue = lastName
+            )
+            // Age Field
+            DateTextField(
+                labelValue = "Birth Date",
+                painterResources = painterResource(id = R.drawable.login),
+                dateValue = age
+            )
+            // Specialty Field
+            SpecialityDropdown(
+                selectedSpeciality = selectedSpeciality, specialityList = specialityList
+            )
+
+            // Email Field
+            MyTextField(
+                labelValue = "Email",
+                painterResources = painterResource(id = R.drawable.icon_mail),
+                textValue = email
+            )
+            if (showErrors && !isEmailValid) {
+                Text("Invalid email", color = Color.Red, fontSize = 12.sp)
             }
-            Column(modifier = Modifier.fillMaxSize()) {
-                NormalTextComponent(value = "Hello there, ")
-                HeadingTextComponent(value = "Create an Account ")
-                Spacer(modifier = Modifier.height(20.dp))
 
-                // Name Field
-                MyTextField(
-                    labelValue = "First Name",
-                    painterResources = painterResource(id = R.drawable.login),
-                    textValue = firstName
-                )
-                // Surname Field
-                MyTextField(
-                    labelValue = "Last Name",
-                    painterResources = painterResource(id = R.drawable.login),
-                    textValue = lastName
-                )
-                // Age Field
-                DateTextField(
-                    labelValue = "Birth Date",
-                    painterResources = painterResource(id = R.drawable.login),
-                    dateValue = age
-                )
-                // Specialty Field
-                SpecialityDropdown(
-                    selectedSpeciality = selectedSpeciality, specialityList = specialityList
-                )
+            // Password Field
+            PasswordTextField(
+                labelValue = "Password",
+                painterResources = painterResource(id = R.drawable.icon_password),
+                passwordValue = password
+            )
+            Spacer(modifier = Modifier.height(20.dp))
 
-                // Email Field
-                MyTextField(
-                    labelValue = "Email",
-                    painterResources = painterResource(id = R.drawable.icon_mail),
-                    textValue = email
-                )
-                if (showErrors && !isEmailValid) {
-                    Text("Invalid email", color = Color.Red, fontSize = 12.sp)
-                }
-
-                // Password Field
-                PasswordTextField(
-                    labelValue = "Password",
-                    painterResources = painterResource(id = R.drawable.icon_password),
-                    passwordValue = password
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Pass to the view of Login
-                Row(
-                    horizontalArrangement = Arrangement.Center,
+            // Pass to the view of Login
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(text = "Already have an account? ")
+                Text(text = "Login",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text(text = "Already have an account? ")
-                    Text(text = "Login",
-                        modifier = Modifier
-                            .clickable { navController.navigate("login") }
-                            .padding(start = 2.dp))
-                }
+                        .clickable { navController.navigate("login") }
+                        .padding(start = 2.dp))
+            }
 
-                Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(100.dp))
 
-                // Button SignUp
-                ButtonComponent(value = "Register", enabled = isFormValid()) {
-                    val nurse = NurseState(
-                        id = 0,
-                        name = firstName.value,
-                        surname = lastName.value,
-                        age = age.value,
-                        email = email.value,
-                        password = password.value,
-                        speciality = selectedSpeciality.value
-                    )
-                    nurseViewModel.addNurse(nurse)
-                    Toast.makeText(mContext, "New nurse created", Toast.LENGTH_SHORT).show()
-                    //This navigates to the "home" screen and removes the "create" page from the back stack.
-                    navController.navigate("home") {
-                        // The popUpTo ensures that the "create" page is not accessible via the back button
-                        popUpTo("create") {
-                            inclusive = true
-                        }
+            // Button SignUp
+            ButtonComponent(value = "Register", enabled = isFormValid()) {
+                val nurse = NurseState(
+                    id = 0,
+                    name = firstName.value,
+                    surname = lastName.value,
+                    age = age.value,
+                    email = email.value,
+                    password = password.value,
+                    speciality = selectedSpeciality.value
+                )
+                nurseViewModel.addNurse(nurse)
+                Toast.makeText(mContext, "New nurse created", Toast.LENGTH_SHORT).show()
+                //This navigates to the "home" screen and removes the "create" page from the back stack.
+                navController.navigate("home") {
+                    // The popUpTo ensures that the "create" page is not accessible via the back button
+                    popUpTo("create") {
+                        inclusive = true
                     }
                 }
-
             }
+
         }
     }
 
