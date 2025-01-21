@@ -274,8 +274,6 @@ fun CreateNursePage(
         return firstName.value.isNotEmpty() && lastName.value.isNotEmpty() && age.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && selectedSpeciality.value.isNotEmpty() && isEmailValid // Optionally check if email is valid
     }
 
-    val mContext = LocalContext.current
-
     Surface(
         modifier = Modifier
             .fillMaxSize()
