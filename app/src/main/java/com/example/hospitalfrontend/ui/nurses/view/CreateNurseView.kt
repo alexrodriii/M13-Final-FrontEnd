@@ -1,6 +1,6 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.R.color.*
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.network.*
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.*
 
@@ -246,7 +247,16 @@ fun ButtonComponent(value: String, enabled: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel) {
+fun CreateNursePage(
+    navController: NavController,
+    nurseViewModel: NurseViewModel,
+    remoteViewModel: RemoteViewModel
+) {
+    val messageApi = remoteViewModel.remoteApiMessage.value
+    // State for controller of dialog visibility
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogMessage by rememberSaveable { mutableStateOf("") }
+
     val firstName = rememberSaveable { mutableStateOf("") }
     val lastName = rememberSaveable { mutableStateOf("") }
     val age = rememberSaveable { mutableStateOf("") }
@@ -344,14 +354,44 @@ fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel
                     password = password.value,
                     speciality = selectedSpeciality.value
                 )
-                nurseViewModel.addNurse(nurse)
-                Toast.makeText(mContext, "New nurse created", Toast.LENGTH_SHORT).show()
-                //This navigates to the "home" screen and removes the "create" page from the back stack.
-                navController.navigate("home") {
-                    // The popUpTo ensures that the "create" page is not accessible via the back button
-                    popUpTo("create") {
-                        inclusive = true
+                remoteViewModel.createNurse(nurse)
+            }
+
+            // Mostrar el diálogo si es necesario
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("OK")
+                        }
+                    },
+                    title = {
+                        Text(text = "Fail creating a new account")
+                    },
+                    text = {
+                        Text(text = dialogMessage)
                     }
+                )
+            }
+
+            LaunchedEffect(messageApi) {
+                when (messageApi) {
+                    is RemoteApiMessageNurse.Success -> {
+                        nurseViewModel.addNurse(messageApi.message)
+                        remoteViewModel.clearApiMessage() // Change the message to Loading to avoid repeated messages when user is logout
+                        navController.navigate("home") {
+                            popUpTo("create") { inclusive = true }
+                        }
+                    }
+
+                    is RemoteApiMessageNurse.Error -> {
+                        // Show dialog with a specific message
+                        dialogMessage = "Error creating a new account"
+                        showDialog = true // Show the dialog
+                    }
+
+                    RemoteApiMessageNurse.Loading -> Log.d("Loading", "Loading")
                 }
             }
 
@@ -365,8 +405,9 @@ fun CreateNursePage(navController: NavController, nurseViewModel: NurseViewModel
 fun CreateNursePagePreview() {
     val navController = rememberNavController()
     val nurseViewModel = NurseViewModel()
+    val remoteViewModel = RemoteViewModel()
 
     HospitalFrontEndTheme {
-        CreateNursePage(navController, nurseViewModel)
+        CreateNursePage(navController, nurseViewModel, remoteViewModel)
     }
 }

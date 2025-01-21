@@ -13,4 +13,6 @@ interface ApiService {
     @POST("nurse/login")
     suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState
 
+    @POST("nurse")
+    suspend fun createNurse(@Body nurse: NurseState): NurseState
 }
