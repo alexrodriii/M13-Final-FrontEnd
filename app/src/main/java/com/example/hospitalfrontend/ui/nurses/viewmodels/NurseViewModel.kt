@@ -11,6 +11,9 @@ class NurseViewModel : ViewModel() {
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> get() = _loginState.asStateFlow()
 
+    private val _nurseState = MutableStateFlow<NurseState?>(null)
+    val nurseState: StateFlow<NurseState?> get() = _nurseState.asStateFlow()
+
     // Variable for a list of nurse
     private val _nurses = MutableStateFlow<List<NurseState>>(listOf())
     private var _idNurse: Int = 1
@@ -85,9 +88,14 @@ class NurseViewModel : ViewModel() {
         return _loginState.value.isLogin
     }
 
+    fun getNurseState(): NurseState? {
+        return _nurseState.value
+    }
+
     // Disconnect Nurse User
     fun disconnectNurse() {
         setLoginState(false)
+        _nurseState.value = null
     }
 
     // Add new Nurse into the list
@@ -97,16 +105,10 @@ class NurseViewModel : ViewModel() {
         setLoginState(true)
     }
 
-    // Check if mail and password are in the list
-    fun loginNurse(mail: String, password: String) {
-        viewModelScope.launch {
-            val nurse = nurses.value.find { it.email == mail && it.password == password }
-            if (nurse != null) {
-                setLoginState(true)
-            } else {
-                setLoginState(false)
-            }
-        }
+    // If the data is on data base save the data of response in a variable
+    fun loginNurse(nurse: NurseState) {
+        setLoginState(true)
+        _nurseState.value = nurse
     }
 
     // Update the search name
