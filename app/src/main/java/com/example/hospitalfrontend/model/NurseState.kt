@@ -9,9 +9,3 @@ data class NurseState(
     val password: String,
     val speciality: String
 )
-
-data class LoginRequest(
-    val email: String,
-    val password: String
-)
-

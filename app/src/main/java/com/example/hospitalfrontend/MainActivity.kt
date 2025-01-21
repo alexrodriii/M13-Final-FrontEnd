@@ -64,7 +64,6 @@ fun MyAppHomePage(
     NavHost(navController = navController, startDestination = startDestination) {
         composable("home") {
             HomeScreen(
-                isLoggedIn = loginState.isLogin,
                 navController = navController,
                 nurseViewModel = nurseViewModel
             )
@@ -83,14 +82,14 @@ fun MyAppHomePage(
             )
         }
         composable("create") {
-            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel)
+            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel, remoteViewModel = remoteViewModel)
 
         }
     }
 }
 
 @Composable
-fun HomeScreen(isLoggedIn: Boolean, navController: NavController, nurseViewModel: NurseViewModel) {
+fun HomeScreen(navController: NavController, nurseViewModel: NurseViewModel) {
     val options = listOf("Find", "List") // Show Find and List when logged in
 
     Column(

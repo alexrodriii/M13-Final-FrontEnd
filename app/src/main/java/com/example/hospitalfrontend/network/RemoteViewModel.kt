@@ -50,4 +50,21 @@ class RemoteViewModel : ViewModel() {
         }
     }
 
+    fun createNurse(nurse: NurseState) {
+        viewModelScope.launch {
+            remoteApiMessage.value = RemoteApiMessageNurse.Loading
+            try {
+                val connection = Retrofit.Builder().baseUrl("http://10.0.2.2:8080/")
+                    .addConverterFactory(GsonConverterFactory.create()).build()
+
+                val endPoint = connection.create(ApiService::class.java)
+                // Call to the end-point to create a new nurse
+                val response = endPoint.createNurse(nurse)
+                remoteApiMessage.value = RemoteApiMessageNurse.Success(response)
+            } catch (e: Exception) {
+                remoteApiMessage.value = RemoteApiMessageNurse.Error
+            }
+        }
+    }
+
 }

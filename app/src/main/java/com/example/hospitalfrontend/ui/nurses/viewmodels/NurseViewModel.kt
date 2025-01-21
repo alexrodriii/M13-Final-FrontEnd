@@ -100,8 +100,7 @@ class NurseViewModel : ViewModel() {
 
     // Add new Nurse into the list
     fun addNurse(nurse: NurseState) {
-        val nurseWithId = nurse.copy(id = _idNurse++) // Use _idNurse to auto-increment ID
-        _nurses.value += nurseWithId // Add to the list
+        _nurseState.value = nurse
         setLoginState(true)
     }
 
