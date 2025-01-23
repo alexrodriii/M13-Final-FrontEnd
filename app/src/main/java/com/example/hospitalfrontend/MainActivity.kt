@@ -58,10 +58,12 @@ fun MyAppHomePage(
     // Observe the login state as a StateFlow
     val loginState by nurseViewModel.loginState.collectAsState()
 
-    NavHost(navController = navController, startDestination = "home") {
+    // Determines the initial screen according to the authentication status
+    val startDestination = if (loginState.isLogin) "home" else "login"
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("home") {
             HomeScreen(
-                isLoggedIn = loginState.isLogin,
                 navController = navController,
                 nurseViewModel = nurseViewModel
             )
@@ -73,22 +75,22 @@ fun MyAppHomePage(
             FindScreen(navController = navController, nurseViewModel = nurseViewModel)
         }
         composable("login") {
-            HospitalLoginScreen(navController = navController, nurseViewModel = nurseViewModel)
+            HospitalLoginScreen(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteViewModel = remoteViewModel
+            )
         }
         composable("create") {
-            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel)
+            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel, remoteViewModel = remoteViewModel)
 
         }
     }
 }
 
 @Composable
-fun HomeScreen(isLoggedIn: Boolean, navController: NavController, nurseViewModel: NurseViewModel) {
-    val options = if (isLoggedIn) {
-        listOf("Find", "List") // Show Find and List when logged in
-    } else {
-        listOf("Login", "Create") // Show Login and Create when not logged in
-    }
+fun HomeScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+    val options = listOf("Find", "List") // Show Find and List when logged in
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -112,20 +114,17 @@ fun HomeScreen(isLoggedIn: Boolean, navController: NavController, nurseViewModel
             )
         }
 
-        // Render the Logout button last if the user is logged in
-        if (isLoggedIn) {
-            Button(
-                onClick = {
-                    nurseViewModel.disconnectNurse() // Call the disconnect method
-                    navController.navigate("home") // Navigate back to home
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(8.dp)
-            ) {
-                Text("Logout")
-            }
+        Button(
+            onClick = {
+                nurseViewModel.disconnectNurse() // Call the disconnect method
+                navController.navigate("home") // Navigate back to home
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .padding(8.dp)
+        ) {
+            Text("Logout")
         }
     }
 }
