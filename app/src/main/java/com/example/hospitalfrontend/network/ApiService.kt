@@ -10,6 +10,9 @@ interface ApiService {
     @GET("nurse/{id}")
     suspend fun getNurseById(@Path("id") id: Int): NurseState
 
+    @GET("nurse")
+    suspend fun getAll(): List<NurseState>
+
     @POST("nurse/login")
     suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState
 
