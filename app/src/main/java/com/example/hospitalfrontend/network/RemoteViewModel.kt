@@ -11,7 +11,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RemoteViewModel : ViewModel() {
     var remoteApiMessage = mutableStateOf<RemoteApiMessageNurse>(RemoteApiMessageNurse.Loading)
-    private set
+        private set
+    var remoteApiListMessage =
+        mutableStateOf<RemoteApiMessageListNurse>(RemoteApiMessageListNurse.Loading)
 
     fun clearApiMessage() {
         remoteApiMessage.value = RemoteApiMessageNurse.Loading
@@ -32,6 +34,23 @@ class RemoteViewModel : ViewModel() {
             }
         }
     }
+    //We do the request to the API
+    fun getAllNurses() {
+        viewModelScope.launch {
+            remoteApiListMessage.value = RemoteApiMessageListNurse.Loading
+            try {
+                val connection = Retrofit.Builder().baseUrl("http://10.0.2.2:8080/")
+                    .addConverterFactory(GsonConverterFactory.create()).build()
+                val endPoint = connection.create(ApiService::class.java)
+                // Call to the end-pont to get all nurses
+                val response = endPoint.getAll()
+                remoteApiListMessage.value = RemoteApiMessageListNurse.Success(response)
+            } catch (e: Exception) {
+                remoteApiListMessage.value = RemoteApiMessageListNurse.Error
+            }
+        }
+    }
+
 
     fun loginNurse(nurse: LoginRequest) {
         viewModelScope.launch {

@@ -1,6 +1,7 @@
 package com.example.hospitalfrontend
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
+import com.example.hospitalfrontend.network.RemoteApiMessageListNurse
+import com.example.hospitalfrontend.network.RemoteApiMessageNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
 import com.example.hospitalfrontend.ui.nurses.view.*
@@ -42,7 +45,8 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel(), remoteViewModel = RemoteViewModel()
+            nurseViewModel = NurseViewModel(),
+            remoteViewModel = RemoteViewModel()
         )
     }
 }
@@ -52,6 +56,7 @@ fun HomePage() {
 fun MyAppHomePage(
     nurseViewModel: NurseViewModel, remoteViewModel: RemoteViewModel
 ) {
+    val remoteApiMessageListNurse = remoteViewModel.remoteApiListMessage.value
     // Set up the NavController for navigation
     val navController = rememberNavController()
 
@@ -69,7 +74,30 @@ fun MyAppHomePage(
             )
         }
         composable("list") {
-            ListNurseScreen(navController = navController, nurseViewModel = nurseViewModel)
+            //Variable for the error
+            val isError = remember { mutableStateOf(false) }
+            //Shows us the answer about the request to the API
+            LaunchedEffect(Unit) {
+                remoteViewModel.getAllNurses()
+            }
+
+            when (remoteApiMessageListNurse) {
+                is RemoteApiMessageListNurse.Success -> {
+                    nurseViewModel.loadNurses(remoteApiMessageListNurse.message)
+                }
+
+                is RemoteApiMessageListNurse.Error -> {
+                    Log.d("List Error", "Error")
+                    isError.value = true
+                }
+
+                is RemoteApiMessageListNurse.Loading -> {
+                    Log.d("List", "Loading List")
+
+                }
+
+            }
+            ListNurseScreen(navController = navController, nurseViewModel = nurseViewModel, isError = isError)
         }
         composable("find") {
             FindScreen(navController = navController, nurseViewModel = nurseViewModel)
@@ -82,7 +110,11 @@ fun MyAppHomePage(
             )
         }
         composable("create") {
-            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel, remoteViewModel = remoteViewModel)
+            CreateNursePage(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteViewModel = remoteViewModel
+            )
 
         }
     }

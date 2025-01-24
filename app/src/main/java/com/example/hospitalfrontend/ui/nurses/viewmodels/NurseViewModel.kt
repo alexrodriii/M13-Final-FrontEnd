@@ -3,10 +3,11 @@ package com.example.hospitalfrontend.ui.nurses.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hospitalfrontend.model.*
+import com.example.hospitalfrontend.network.RemoteViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class NurseViewModel : ViewModel() {
+class NurseViewModel() : ViewModel() {
     // Login variables
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> get() = _loginState.asStateFlow()
@@ -16,65 +17,15 @@ class NurseViewModel : ViewModel() {
 
     // Variable for a list of nurse
     private val _nurses = MutableStateFlow<List<NurseState>>(listOf())
-    private var _idNurse: Int = 1
     val nurses: StateFlow<List<NurseState>> = _nurses
 
     // Variable for search nurse
     private val _searchState = MutableStateFlow(SearchState())
     val searchState: StateFlow<SearchState> get() = _searchState.asStateFlow()
 
-    init {
-        loadNurses()
-    }
-
     // Load the list of the Nurse
-    private fun loadNurses() {
-        viewModelScope.launch {
-            _nurses.value = listOf(
-                NurseState(
-                    id = _idNurse++,
-                    name = "Pedro",
-                    surname = "Pascal",
-                    age = "10/01/2000",
-                    email = "pedropascal@gmail.com",
-                    password = "PedroPass1",
-                    speciality = "Cardiac Care"
-                ), NurseState(
-                    id = _idNurse++,
-                    name = "Antonio",
-                    surname = "Perez",
-                    age = "10/01/1967",
-                    email = "a.perez@gmail.com",
-                    password = "AntonioPass1",
-                    speciality = "Obstetrics"
-                ), NurseState(
-                    id = _idNurse++,
-                    name = "Maria",
-                    surname = "Lopez",
-                    age = "10/01/1997",
-                    email = "m.lopez@gmail.com",
-                    password = "MariaPass1",
-                    speciality = "Perioperative"
-                ), NurseState(
-                    id = _idNurse++,
-                    name = "Sara",
-                    surname = "Garcia",
-                    age = "10/01/1999",
-                    email = "s.garcia@gmail.com",
-                    password = "SaraPass1",
-                    speciality = "Mental Health"
-                ),
-                NurseState(
-                    id = _idNurse++,
-                    name = "Antonio",
-                    surname = "Lopez",
-                    age = "31/12/1987",
-                    email = "a.lopez@gmail.com",
-                    password = "AntonioPass1",
-                    speciality = "Oncology"
-                )
-            )
-        }
+    fun loadNurses(nurse: List<NurseState>) {
+        _nurses.value = nurse
     }
 
     // Update the value of login
