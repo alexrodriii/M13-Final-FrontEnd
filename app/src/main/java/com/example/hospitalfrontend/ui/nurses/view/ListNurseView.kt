@@ -1,6 +1,7 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.remember
 import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,8 +24,25 @@ import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 
 @Composable
-fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel, isError: MutableState<Boolean>) {
     val nurses by nurseViewModel.nurses.collectAsState()
+    //Pop up error
+    if (isError.value) {
+        AlertDialog(
+            onDismissRequest = { isError.value = false },
+            confirmButton = {
+                TextButton(onClick = { isError.value = false }) {
+                    Text("OK")
+                }
+            },
+            title = {
+                Text(text = "Error: List Nurse", color= Color.Red)
+            },
+            text = {
+                Text(text = "Failing into fetching data of list nurses")
+            }
+        )
+    }
 
     // Use a Box to stack the back button and LazyColumn
     Box(
@@ -56,8 +75,6 @@ fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel
         }
     }
 }
-
-
 @Composable
 fun NurseListItem(nurse: NurseState) {
     val age by remember(nurse.age) { // Calculate age only when nurse.age changes
@@ -73,7 +90,7 @@ fun NurseListItem(nurse: NurseState) {
             modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically
         ) {
 
-            androidx.compose.foundation.Image(
+            Image(
                 painter = painterResource(id = R.drawable.nurse_profile),
                 contentDescription = "Image Profile",
                 modifier = Modifier.size(50.dp)
@@ -110,7 +127,7 @@ fun calculateAge(birthDate: String): Int {
 }
 
 
-// Preview
+/* Preview
 @Preview(showBackground = true)
 @Composable
 fun ListPage() {
@@ -121,5 +138,5 @@ fun ListPage() {
             navController, nurseViewModel = NurseViewModel()
         )
     }
-}
+}*/
 
