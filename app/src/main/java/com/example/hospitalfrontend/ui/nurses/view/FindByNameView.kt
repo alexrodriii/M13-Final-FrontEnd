@@ -1,7 +1,7 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -20,23 +20,32 @@ import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.*
+import androidx.compose.runtime.collectAsState
+import com.example.hospitalfrontend.network.RemoteApiMessageNurse
+import com.example.hospitalfrontend.network.RemoteViewModel
 
 
 @Preview
+
 @Composable
 fun MySearchPreview() {
     HospitalFrontEndTheme {
         val navController = rememberNavController()
-        FindScreen(navController, nurseViewModel = NurseViewModel())
+        val nurseViewModel = NurseViewModel()
+        val remoteViewModel = RemoteViewModel()
+        FindScreen(
+            navController,
+            remoteViewModel,
+            nurseViewModel,
+        )
     }
 
 }
 
 @Composable
-fun TextField(labelValue: String, viewModel: NurseViewModel) {
-    val searchState by viewModel.searchState.collectAsState()
-
-    OutlinedTextField(label = { Text(text = labelValue) },
+fun TextField(labelValue: String, onValueChange: (String) -> Unit, textFieldValue: String = "") {
+    OutlinedTextField(
+        label = { Text(text = labelValue) },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(4.dp),
         colors = TextFieldDefaults.colors(
@@ -46,8 +55,9 @@ fun TextField(labelValue: String, viewModel: NurseViewModel) {
             focusedLabelColor = Primary,
         ),
         keyboardOptions = KeyboardOptions.Default,
-        value = searchState.nurseName,
-        onValueChange = { viewModel.updateSearchName(it) })
+        value = textFieldValue,
+        onValueChange = { onValueChange(it) }
+    )
 }
 
 @Composable
@@ -81,62 +91,78 @@ fun ListSearchNurse(nurse: NurseState) {
 }
 
 @Composable
-fun FindScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+fun FindScreen(
+    navController: NavController,
+    remoteApiMessage: RemoteViewModel,
+    nurseViewModel: NurseViewModel
+) {
+    val currentSearchName by nurseViewModel.currentSearchName.collectAsState()
+    val message = remoteApiMessage.remoteApiMessage.value
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .padding(28.dp)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 20.dp)
         ) {
-            // Back button at the top-right
+            // Botón de cierre
             IconButton(
-                onClick = {
-                    navController.popBackStack()
-                }, modifier = Modifier
-                    .align(Alignment.TopEnd) // Position at top-right
-                    .zIndex(1f) // Ensures this is above LazyColumn
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.End)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Close, // Example icon
+                    imageVector = Icons.Filled.Close,
                     contentDescription = "Close Button",
                     tint = colorResource(id = R.color.colorText)
                 )
             }
-            Column(modifier = Modifier.fillMaxSize()) {
-                // Title of the screen
-                HeadingTextComponent("Find by Name")
-                Spacer(modifier = Modifier.height(20.dp))
-                // TextField
-                TextField("Name of nurse", nurseViewModel)
-                Spacer(modifier = Modifier.height(25.dp))
 
-                // Button that gets disabled if the text field is empty
-                val searchState by nurseViewModel.searchState.collectAsState()
-                ButtonComponent(
-                    value = "Search",
-                    enabled = searchState.nurseName.isNotBlank() // Enable the button only if text is not blank
-                ) {
-                    nurseViewModel.findNurseByName()
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Campo de texto para el nombre
+            TextField(
+                labelValue = "Name of nurse",
+                onValueChange = {
+                    nurseViewModel.updateCurrentSearchName(it)
+                },
+                textFieldValue = currentSearchName
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            // Botón para buscar
+            ButtonComponent(
+                value = "Search",
+                enabled = currentSearchName.isNotBlank()
+            ) {
+                remoteApiMessage.findByName(currentSearchName)
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Manejo de estados de UI
+            when (message) {
+                is RemoteApiMessageNurse.Loading -> {
+                    Log.d("Loading", "Searching Nurse")
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
-                // Display results
-                Text(text = searchState.resultMessage)
+                is RemoteApiMessageNurse.Error -> {
+                    Text(
+                        text = "Error fetching nurse",
+                        color = Color.Red,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
 
-                // Show data of all the nurse with the same name
-                if (searchState.resultMessage != "Not Found") {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    LazyColumn {
-                        items(searchState.searchResults) { nurse ->
-                            ListSearchNurse(nurse = nurse)
-                        }
-                    }
+                is RemoteApiMessageNurse.Success -> {
+                    ListSearchNurse(message.message)
                 }
             }
         }
     }
 }
+
