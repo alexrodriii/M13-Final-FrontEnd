@@ -58,13 +58,23 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    //Icons extends
     implementation(libs.androidx.material.icons.extended)
     //ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.threetenabp) // Or latest version
     // Imports to connect to back-end
-    implementation (libs.retrofit)
+    implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation (libs.converter.gson)
+    implementation(libs.converter.gson)
+    // Profile
+    implementation(libs.androidx.core.ktx.v1120)
+    implementation(libs.material)
+    implementation(libs.ui.tooling.preview)
+    // Test
+    debugImplementation(libs.androidx.compose.ui.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
+    androidTestImplementation(libs.ui.test.junit4)
+    // Allow to select images
+    implementation (libs.accompanist.permissions)
+    implementation (libs.androidx.activity.ktx.v131)
 }
