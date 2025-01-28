@@ -180,8 +180,10 @@ fun PasswordTextField(
 
 @Composable
 fun SpecialityDropdown(
-    selectedSpeciality: MutableState<String>, specialityList: List<String>
+    viewModel: NurseViewModel,
+    selectedSpeciality: MutableState<String>
 ) {
+    val specialityList by viewModel.specialityNurse.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
     Column {
@@ -268,7 +270,6 @@ fun CreateNursePage(
 
     val isEmailValid =
         Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").matches(email.value)
-    val specialityList = listOf("Pediatrics", "Cardiology", "Neurology", "Oncology", "Orthopedics")
 
     fun isFormValid(): Boolean {
         return firstName.value.isNotEmpty() && lastName.value.isNotEmpty() && age.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && selectedSpeciality.value.isNotEmpty() && isEmailValid // Optionally check if email is valid
@@ -287,25 +288,23 @@ fun CreateNursePage(
             // Name Field
             MyTextField(
                 labelValue = "First Name",
-                painterResources = painterResource(id = R.drawable.login),
+                painterResources = painterResource(id = R.drawable.icon_user),
                 textValue = firstName
             )
             // Surname Field
             MyTextField(
                 labelValue = "Last Name",
-                painterResources = painterResource(id = R.drawable.login),
+                painterResources = painterResource(id = R.drawable.icon_user),
                 textValue = lastName
             )
             // Age Field
             DateTextField(
                 labelValue = "Birth Date",
-                painterResources = painterResource(id = R.drawable.login),
+                painterResources = painterResource(id = R.drawable.icon_user),
                 dateValue = age
             )
             // Specialty Field
-            SpecialityDropdown(
-                selectedSpeciality = selectedSpeciality, specialityList = specialityList
-            )
+            SpecialityDropdown(nurseViewModel, selectedSpeciality)
 
             // Email Field
             MyTextField(

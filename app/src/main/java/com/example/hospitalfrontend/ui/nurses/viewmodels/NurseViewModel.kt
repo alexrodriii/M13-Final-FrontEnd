@@ -19,12 +19,42 @@ class NurseViewModel : ViewModel() {
     private var _idNurse: Int = 1
     val nurses: StateFlow<List<NurseState>> = _nurses
 
+    // List of nurse specialties
+    private val _specialityNurse = MutableStateFlow<List<String>>(emptyList())
+    val specialityNurse: StateFlow<List<String>> = _specialityNurse
+
     // Variable for search nurse
     private val _searchState = MutableStateFlow(SearchState())
     val searchState: StateFlow<SearchState> get() = _searchState.asStateFlow()
 
     init {
         loadNurses()
+        loadSpeciality()
+    }
+
+    private fun loadSpeciality() {
+        viewModelScope.launch {
+            val sortedSpecialities = listOf(
+                "Pediatrics Nursing",
+                "Cardiology Nursing",
+                "Neurology Nursing",
+                "Oncology Nursing",
+                "Surgical Nursing",
+                "Neonatal Nursing",
+                "Emergency Nursing",
+                "Critical Care Nursing",
+                "Psychiatric Nursing",
+                "Obstetrics and Gynecology Nursing",
+                "Orthopedic Nursing",
+                "Anesthesia Nursing",
+                "Palliative Care Nursing",
+                "Nephrology Nursing",
+                "Transplant Nursing",
+                "Forensic Nursing",
+                "Research Nursing"
+            ).sorted()
+            _specialityNurse.value = sortedSpecialities
+        }
     }
 
     // Load the list of the Nurse

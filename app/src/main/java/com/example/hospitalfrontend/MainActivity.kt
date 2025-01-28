@@ -62,6 +62,17 @@ fun MyAppHomePage(
     val startDestination = if (loginState.isLogin) "home" else "login"
 
     NavHost(navController = navController, startDestination = startDestination) {
+        composable("create") {
+            CreateNursePage(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteViewModel = remoteViewModel
+            )
+
+        }
+        composable("find") {
+            FindScreen(navController = navController, nurseViewModel = nurseViewModel)
+        }
         composable("home") {
             HomeScreen(
                 navController = navController,
@@ -71,9 +82,6 @@ fun MyAppHomePage(
         composable("list") {
             ListNurseScreen(navController = navController, nurseViewModel = nurseViewModel)
         }
-        composable("find") {
-            FindScreen(navController = navController, nurseViewModel = nurseViewModel)
-        }
         composable("login") {
             HospitalLoginScreen(
                 navController = navController,
@@ -81,16 +89,15 @@ fun MyAppHomePage(
                 remoteViewModel = remoteViewModel
             )
         }
-        composable("create") {
-            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel, remoteViewModel = remoteViewModel)
-
+        composable("profile") {
+            ProfileScreen(navController = navController, nurseViewModel = nurseViewModel)
         }
     }
 }
 
 @Composable
 fun HomeScreen(navController: NavController, nurseViewModel: NurseViewModel) {
-    val options = listOf("Find", "List") // Show Find and List when logged in
+    val options = listOf("Find", "List", "Profile") // Show Find and List when logged in
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -112,19 +119,6 @@ fun HomeScreen(navController: NavController, nurseViewModel: NurseViewModel) {
                 onScreenSelected = { navController.navigate(option.lowercase()) },
                 textButton = option
             )
-        }
-
-        Button(
-            onClick = {
-                nurseViewModel.disconnectNurse() // Call the disconnect method
-                navController.navigate("home") // Navigate back to home
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(8.dp)
-        ) {
-            Text("Logout")
         }
     }
 }
