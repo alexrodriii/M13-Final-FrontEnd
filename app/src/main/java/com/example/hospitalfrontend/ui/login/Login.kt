@@ -1,81 +1,76 @@
 package com.example.hospitalfrontend.ui.login
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.*
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.R.color.colorText
+import com.example.hospitalfrontend.model.LoginRequest
+import com.example.hospitalfrontend.network.RemoteApiMessageNurse
+import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
-import com.example.hospitalfrontend.ui.theme.*
+import com.example.hospitalfrontend.ui.theme.Primary
+import com.example.hospitalfrontend.ui.theme.Secundary
 
 @Composable
 fun HospitalLoginScreen(
-    nurseViewModel: NurseViewModel, navController: NavController
+    nurseViewModel: NurseViewModel, navController: NavController, remoteViewModel: RemoteViewModel
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            LoginOrRegisterScreen(navController, nurseViewModel)
+            LoginOrRegisterScreen(navController, nurseViewModel, remoteViewModel)
         }
     }
 }
 
 @Composable
 fun LoginOrRegisterScreen(
-    navController: NavController, nurseViewModel: NurseViewModel
+    navController: NavController, nurseViewModel: NurseViewModel, remoteViewModel: RemoteViewModel
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image()
-            Text(
-                text = "Login", modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(), style = TextStyle(
-                    fontSize = 30.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal
-                ), color = colorResource(id = colorText), textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            UserForm(nurseViewModel, navController)
-        }
-
-        IconButton(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp) // Add padding for better visual spacing
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Close",
-                tint = colorResource(id = colorText)
-            )
-        }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image()
+        Text(
+            text = "Login", modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(), style = TextStyle(
+                fontSize = 30.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal
+            ), color = colorResource(id = colorText), textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        UserForm(nurseViewModel, navController, remoteViewModel)
     }
 }
 
@@ -106,8 +101,13 @@ fun Image() {
 
 @Composable
 fun UserForm(
-    nurseViewModel: NurseViewModel, navController: NavController
+    nurseViewModel: NurseViewModel, navController: NavController, remoteViewModel: RemoteViewModel
 ) {
+    val messageApi = remoteViewModel.remoteApiMessage.value
+    // State for controller of dialog visibility
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogMessage by rememberSaveable { mutableStateOf("") }
+
     //Create variables for the form
     val email = rememberSaveable {
         mutableStateOf("")
@@ -125,8 +125,6 @@ fun UserForm(
         //trims() to remove the white space and .isNotEmpty for that isn't empty
         email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
     }
-    //Validate de login
-    val mContext = LocalContext.current
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         //The text field email
@@ -146,20 +144,49 @@ fun UserForm(
         SubmitButton(
             textId = "Login", inputValid = isValid
         ) {
-            nurseViewModel.loginNurse(email.value, password.value)
-            if (nurseViewModel.loginState.value.isLogin) {
-                Toast.makeText(mContext, "Successfully Login", Toast.LENGTH_SHORT).show()
-                //This navigates to the "home" screen and removes the "login" page from the back stack.
-                navController.navigate("home") {
-                    // The popUpTo ensures that the "login" page is not accessible via the back button
-                    popUpTo("login") {
-                        inclusive = true
+            val dataLogin = LoginRequest(email.value, password.value)
+            remoteViewModel.loginNurse(dataLogin)
+        }
+
+        // Mostrar el diálogo si es necesario
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("OK")
+                    }
+                },
+                title = {
+                    Text(text = "ERROR: Login")
+                },
+                text = {
+                    Text(text = dialogMessage)
+                }
+            )
+        }
+
+        LaunchedEffect(messageApi) {
+            when (messageApi) {
+                is RemoteApiMessageNurse.Success -> {
+                    // Call to the nurseViewModel to save the nurse in the database
+                    nurseViewModel.loginNurse(messageApi.message)
+                    remoteViewModel.clearApiMessage() // Change the message to Loading to avoid repeated messages when user is logout
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
                     }
                 }
-            } else {
-                Toast.makeText(mContext, "Incorrect Email or Password", Toast.LENGTH_SHORT).show()
+
+                is RemoteApiMessageNurse.Error -> {
+                    // Show dialog with a specific message
+                    dialogMessage = "Incorrect Email or Password"
+                    showDialog = true // Show the dialog
+                }
+
+                RemoteApiMessageNurse.Loading -> Log.d("Loading", "Loading")
             }
         }
+
     }
 }
 
@@ -293,9 +320,10 @@ fun InputField(
 fun PreviewLogin() {
     val navController = rememberNavController()
     val nurseViewModel = NurseViewModel()
+    val remoteViewModel = RemoteViewModel()
 
     HospitalFrontEndTheme {
-        HospitalLoginScreen(nurseViewModel, navController)
+        HospitalLoginScreen(nurseViewModel, navController, remoteViewModel)
     }
 }
 

@@ -3,75 +3,62 @@ package com.example.hospitalfrontend.ui.nurses.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hospitalfrontend.model.*
+import com.example.hospitalfrontend.network.RemoteViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class NurseViewModel : ViewModel() {
+class NurseViewModel() : ViewModel() {
     // Login variables
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> get() = _loginState.asStateFlow()
 
+    private val _nurseState = MutableStateFlow<NurseState?>(null)
+    val nurseState: StateFlow<NurseState?> get() = _nurseState.asStateFlow()
+
     // Variable for a list of nurse
     private val _nurses = MutableStateFlow<List<NurseState>>(listOf())
-    private var _idNurse: Int = 1
     val nurses: StateFlow<List<NurseState>> = _nurses
+
+    // List of nurse specialties
+    private val _specialityNurse = MutableStateFlow<List<String>>(emptyList())
+    val specialityNurse: StateFlow<List<String>> = _specialityNurse
 
     // Variable for search nurse
     private val _currentSearchName = MutableStateFlow("")
     val currentSearchName: StateFlow<String> get() = _currentSearchName.asStateFlow()
 
     init {
-        loadNurses()
+        loadSpeciality()
+    }
+
+    private fun loadSpeciality() {
+        viewModelScope.launch {
+            val sortedSpecialities = listOf(
+                "Pediatrics Nursing",
+                "Cardiology Nursing",
+                "Neurology Nursing",
+                "Oncology Nursing",
+                "Surgical Nursing",
+                "Neonatal Nursing",
+                "Emergency Nursing",
+                "Critical Care Nursing",
+                "Psychiatric Nursing",
+                "Obstetrics and Gynecology Nursing",
+                "Orthopedic Nursing",
+                "Anesthesia Nursing",
+                "Palliative Care Nursing",
+                "Nephrology Nursing",
+                "Transplant Nursing",
+                "Forensic Nursing",
+                "Research Nursing"
+            ).sorted()
+            _specialityNurse.value = sortedSpecialities
+        }
     }
 
     // Load the list of the Nurse
-    private fun loadNurses() {
-        viewModelScope.launch {
-            _nurses.value = listOf(
-                NurseState(
-                    id = _idNurse++,
-                    name = "Pedro",
-                    surname = "Pascal",
-                    age = "10/01/2000",
-                    email = "pedropascal@gmail.com",
-                    password = "PedroPass1",
-                    speciality = "Cardiac Care"
-                ), NurseState(
-                    id = _idNurse++,
-                    name = "Antonio",
-                    surname = "Perez",
-                    age = "10/01/1967",
-                    email = "a.perez@gmail.com",
-                    password = "AntonioPass1",
-                    speciality = "Obstetrics"
-                ), NurseState(
-                    id = _idNurse++,
-                    name = "Maria",
-                    surname = "Lopez",
-                    age = "10/01/1997",
-                    email = "m.lopez@gmail.com",
-                    password = "MariaPass1",
-                    speciality = "Perioperative"
-                ), NurseState(
-                    id = _idNurse++,
-                    name = "Sara",
-                    surname = "Garcia",
-                    age = "10/01/1999",
-                    email = "s.garcia@gmail.com",
-                    password = "SaraPass1",
-                    speciality = "Mental Health"
-                ),
-                NurseState(
-                    id = _idNurse++,
-                    name = "Antonio",
-                    surname = "Lopez",
-                    age = "31/12/1987",
-                    email = "a.lopez@gmail.com",
-                    password = "AntonioPass1",
-                    speciality = "Oncology"
-                )
-            )
-        }
+    fun loadNurses(nurse: List<NurseState>) {
+        _nurses.value = nurse
     }
 
     // Update the value of login
@@ -85,28 +72,26 @@ class NurseViewModel : ViewModel() {
         return _loginState.value.isLogin
     }
 
+    fun getNurseState(): NurseState? {
+        return _nurseState.value
+    }
+
     // Disconnect Nurse User
     fun disconnectNurse() {
         setLoginState(false)
+        _nurseState.value = null
     }
 
     // Add new Nurse into the list
     fun addNurse(nurse: NurseState) {
-        val nurseWithId = nurse.copy(id = _idNurse++) // Use _idNurse to auto-increment ID
-        _nurses.value += nurseWithId // Add to the list
+        _nurseState.value = nurse
         setLoginState(true)
     }
 
-    // Check if mail and password are in the list
-    fun loginNurse(mail: String, password: String) {
-        viewModelScope.launch {
-            val nurse = nurses.value.find { it.email == mail && it.password == password }
-            if (nurse != null) {
-                setLoginState(true)
-            } else {
-                setLoginState(false)
-            }
-        }
+    // If the data is on data base save the data of response in a variable
+    fun loginNurse(nurse: NurseState) {
+        setLoginState(true)
+        _nurseState.value = nurse
     }
 
     fun updateCurrentSearchName(name: String) {

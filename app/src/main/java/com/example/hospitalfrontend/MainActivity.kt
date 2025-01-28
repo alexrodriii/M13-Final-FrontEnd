@@ -1,6 +1,7 @@
 package com.example.hospitalfrontend
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
+import com.example.hospitalfrontend.network.RemoteApiMessageListNurse
+import com.example.hospitalfrontend.network.RemoteApiMessageNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
 import com.example.hospitalfrontend.ui.nurses.view.*
@@ -42,7 +45,8 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel(), remoteViewModel = RemoteViewModel()
+            nurseViewModel = NurseViewModel(),
+            remoteViewModel = RemoteViewModel()
         )
     }
 }
@@ -52,47 +56,76 @@ fun HomePage() {
 fun MyAppHomePage(
     nurseViewModel: NurseViewModel, remoteViewModel: RemoteViewModel
 ) {
+    val remoteApiMessageListNurse = remoteViewModel.remoteApiListMessage.value
     // Set up the NavController for navigation
     val navController = rememberNavController()
 
     // Observe the login state as a StateFlow
     val loginState by nurseViewModel.loginState.collectAsState()
 
-    NavHost(navController = navController, startDestination = "home") {
+    // Determines the initial screen according to the authentication status
+    val startDestination = if (loginState.isLogin) "home" else "login"
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("create") {
+            CreateNursePage(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteViewModel = remoteViewModel
+            )
+
+        }
+        composable("find") {
+            FindScreen(navController = navController, nurseViewModel = nurseViewModel)
+        }
         composable("home") {
             HomeScreen(
-                isLoggedIn = loginState.isLogin,
                 navController = navController,
                 nurseViewModel = nurseViewModel
             )
         }
         composable("list") {
-            ListNurseScreen(navController = navController, nurseViewModel = nurseViewModel)
-        }
-        composable("find") {
-            FindScreen(
-                navController = navController,
-                nurseViewModel = nurseViewModel,
-                remoteApiMessage = remoteViewModel
-            )
+            //Variable for the error
+            val isError = remember { mutableStateOf(false) }
+            //Shows us the answer about the request to the API
+            LaunchedEffect(Unit) {
+                remoteViewModel.getAllNurses()
+            }
+
+            when (remoteApiMessageListNurse) {
+                is RemoteApiMessageListNurse.Success -> {
+                    nurseViewModel.loadNurses(remoteApiMessageListNurse.message)
+                }
+
+                is RemoteApiMessageListNurse.Error -> {
+                    Log.d("List Error", "Error")
+                    isError.value = true
+                }
+
+                is RemoteApiMessageListNurse.Loading -> {
+                    Log.d("List", "Loading List")
+
+                }
+
+            }
+            ListNurseScreen(navController = navController, nurseViewModel = nurseViewModel, isError = isError)
         }
         composable("login") {
-            HospitalLoginScreen(navController = navController, nurseViewModel = nurseViewModel)
+            HospitalLoginScreen(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteViewModel = remoteViewModel
+            )
         }
-        composable("create") {
-            CreateNursePage(navController = navController, nurseViewModel = nurseViewModel)
-
+        composable("profile") {
+            ProfileScreen(navController = navController, nurseViewModel = nurseViewModel)
         }
     }
 }
 
 @Composable
-fun HomeScreen(isLoggedIn: Boolean, navController: NavController, nurseViewModel: NurseViewModel) {
-    val options = if (isLoggedIn) {
-        listOf("Find", "List") // Show Find and List when logged in
-    } else {
-        listOf("Login", "Create") // Show Login and Create when not logged in
-    }
+fun HomeScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+    val options = listOf("Find", "List", "Profile") // Show Find and List when logged in
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -114,22 +147,6 @@ fun HomeScreen(isLoggedIn: Boolean, navController: NavController, nurseViewModel
                 onScreenSelected = { navController.navigate(option.lowercase()) },
                 textButton = option
             )
-        }
-
-        // Render the Logout button last if the user is logged in
-        if (isLoggedIn) {
-            Button(
-                onClick = {
-                    nurseViewModel.disconnectNurse() // Call the disconnect method
-                    navController.navigate("home") // Navigate back to home
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(8.dp)
-            ) {
-                Text("Logout")
-            }
         }
     }
 }

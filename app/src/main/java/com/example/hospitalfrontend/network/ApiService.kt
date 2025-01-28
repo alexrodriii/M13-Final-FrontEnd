@@ -1,14 +1,21 @@
 package com.example.hospitalfrontend.network
 
-import com.example.hospitalfrontend.model.NurseState
-import com.example.hospitalfrontend.model.SearchState
+import com.example.hospitalfrontend.model.*
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
     @GET("nurse/{id}")
     suspend fun getNurseById(@Path("id") id: Int): NurseState
 
-    @GET("nurse/name/{name}")
-    suspend fun findByName(@Path("name") nurseName: String): NurseState
+    @GET("nurse")
+    suspend fun getAll(): List<NurseState>
+
+    @POST("nurse/login")
+    suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState
+
+    @POST("nurse")
+    suspend fun createNurse(@Body nurse: NurseState): NurseState
 }
