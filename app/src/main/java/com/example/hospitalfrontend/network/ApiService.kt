@@ -9,6 +9,6 @@ interface ApiService {
     @GET("nurse/{id}")
     suspend fun getNurseById(@Path("id") id: Int): NurseState
 
-    @GET("nurse/{name}")
-    suspend fun findByName(@Path("name") nurseName: String): NurseState //List<NurseState>
+    @GET("nurse/name/{name}")
+    suspend fun findByName(@Path("name") nurseName: String): NurseState
 }

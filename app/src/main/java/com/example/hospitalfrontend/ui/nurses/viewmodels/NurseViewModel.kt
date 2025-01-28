@@ -17,8 +17,8 @@ class NurseViewModel : ViewModel() {
     val nurses: StateFlow<List<NurseState>> = _nurses
 
     // Variable for search nurse
-    private val _searchState = MutableStateFlow(SearchState())
-    val searchState: StateFlow<SearchState> get() = _searchState.asStateFlow()
+    private val _currentSearchName = MutableStateFlow("")
+    val currentSearchName: StateFlow<String> get() = _currentSearchName.asStateFlow()
 
     init {
         loadNurses()
@@ -109,29 +109,8 @@ class NurseViewModel : ViewModel() {
         }
     }
 
-    // Update the search name
-    fun updateSearchName(name: String) {
-        _searchState.update { it.copy(nurseName = name) }
+    fun updateCurrentSearchName(name: String) {
+        _currentSearchName.value = name
     }
 
-    // Search nurse by name
-    fun findNurseByName() {
-        val results =
-            // Filter help you to search all the nurse that equals with the name
-            _nurses.value.filter { it.name.equals(_searchState.value.nurseName, ignoreCase = true) }
-
-        if (results.isNotEmpty()) {
-            _searchState.update {
-                it.copy(
-                    searchResults = results, resultMessage = "Found ${results.size} nurse(s)."
-                )
-            }
-        } else {
-            _searchState.update {
-                it.copy(
-                    searchResults = emptyList(), resultMessage = "Not Found"
-                )
-            }
-        }
-    }
 }
