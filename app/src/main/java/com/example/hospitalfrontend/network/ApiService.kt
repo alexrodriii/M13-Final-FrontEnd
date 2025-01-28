@@ -18,4 +18,7 @@ interface ApiService {
 
     @POST("nurse")
     suspend fun createNurse(@Body nurse: NurseState): NurseState
+
+    @GET("nurse/name/{name}")
+    suspend fun findByName(@Path("name") nurseName: String): NurseState
 }

@@ -76,7 +76,11 @@ fun MyAppHomePage(
 
         }
         composable("find") {
-            FindScreen(navController = navController, nurseViewModel = nurseViewModel)
+            FindScreen(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteApiMessage = remoteViewModel
+            )
         }
         composable("home") {
             HomeScreen(
@@ -108,7 +112,11 @@ fun MyAppHomePage(
                 }
 
             }
-            ListNurseScreen(navController = navController, nurseViewModel = nurseViewModel, isError = isError)
+            ListNurseScreen(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                isError = isError
+            )
         }
         composable("login") {
             HospitalLoginScreen(

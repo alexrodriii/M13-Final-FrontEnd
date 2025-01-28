@@ -2,7 +2,6 @@ package com.example.hospitalfrontend.ui.nurses.view
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -19,10 +18,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.model.NurseState
-import com.example.hospitalfrontend.network.RemoteApiMessage
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.*
 import androidx.compose.runtime.collectAsState
+import com.example.hospitalfrontend.network.RemoteApiMessageNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 
 
@@ -98,7 +97,7 @@ fun FindScreen(
     nurseViewModel: NurseViewModel
 ) {
     val currentSearchName by nurseViewModel.currentSearchName.collectAsState()
-    val message = remoteApiMessage.remoteApiMessage
+    val message = remoteApiMessage.remoteApiMessage.value
 
     Surface(
         modifier = Modifier
@@ -147,11 +146,11 @@ fun FindScreen(
 
             // Manejo de estados de UI
             when (message) {
-                is RemoteApiMessage.Loading -> {
+                is RemoteApiMessageNurse.Loading -> {
                     Log.d("Loading", "Searching Nurse")
                 }
 
-                is RemoteApiMessage.Error -> {
+                is RemoteApiMessageNurse.Error -> {
                     Text(
                         text = "Error fetching nurse",
                         color = Color.Red,
@@ -159,7 +158,7 @@ fun FindScreen(
                     )
                 }
 
-                is RemoteApiMessage.Success -> {
+                is RemoteApiMessageNurse.Success -> {
                     ListSearchNurse(message.message)
                 }
             }
