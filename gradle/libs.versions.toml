@@ -1,7 +1,17 @@
 [versions]
 accompanistCoil = "0.25.1"
-agp = "8.7.2"
+accompanistPermissions = "0.23.1"
+activityKtx = "1.10.0"
+activityKtxVersion = "1.3.1"
+agp = "8.8.0"
+appcompat = "1.7.0"
+constraintlayout = "2.2.0"
+constraintlayoutCompose = "1.1.0"
+constraintlayoutComposeVersion = "1.0.1"
 converterGson = "2.9.0"
+coreKtxVersion = "1.12.0"
+foundation = "1.7.6"
+googleMaterial = "1.9.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -11,6 +21,9 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 material = "1.0.1"
+material3 = "1.3.1"
+materialIconsExtended = "1.4.3"
+materialVersion = "1.4.3"
 retrofit = "2.9.0"
 okhttp = "4.11.0"
 runtime = "1.0.1"
@@ -18,13 +31,33 @@ threetenabp = "1.4.6"
 ui = "1.0.1"
 navigationRuntimeKtx = "2.8.5"
 navigationCompose = "2.8.5"
+uiTestJunit4 = "1.5.0"
+uiTestManifest = "1.7.6"
+uiTooling = "1.4.3"
+uiToolingPreview = "1.5.0"
+uiToolingVersion = "1.5.0"
+uiVersion = "1.4.3"
 
 [libraries]
 accompanist-coil = { module = "com.google.accompanist:accompanist-coil", version.ref = "accompanistCoil" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+androidx-activity-ktx-v131 = { module = "androidx.activity:activity-ktx", version.ref = "activityKtxVersion" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-compose-ui-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiToolingVersion" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
+androidx-constraintlayout-compose-v101 = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-ktx-v1120 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
+androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialVersion" }
+androidx-material-icons-extended-v143 = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-material-v143 = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
+androidx-ui-v143 = { module = "androidx.compose.ui:ui", version.ref = "uiVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -40,12 +73,18 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = "androidx.compose.material:material-icons-extended:1.5.0"
+material = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
+ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
+ui-tooling = { module = "androidx.compoe.ui:ui-tooling", version.ref = "uiTooling" }
+ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
