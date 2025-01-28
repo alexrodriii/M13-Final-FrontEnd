@@ -1,5 +1,6 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,16 +19,20 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.network.RemoteApiMessage
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.*
+import androidx.compose.runtime.collectAsState
+import com.example.hospitalfrontend.network.RemoteViewModel
 
 
 @Preview
+
 @Composable
 fun MySearchPreview() {
     HospitalFrontEndTheme {
         val navController = rememberNavController()
-        FindScreen(navController, nurseViewModel = NurseViewModel())
+        FindScreen(navController, nurseViewModel = NurseViewModel(), remoteApiMessage = RemoteViewModel)
     }
 
 }
@@ -81,7 +86,13 @@ fun ListSearchNurse(nurse: NurseState) {
 }
 
 @Composable
-fun FindScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+fun FindScreen(
+    navController: NavController, nurseViewModel: NurseViewModel,
+    remoteApiMessage: RemoteViewModel
+) {
+    val searchState by nurseViewModel.searchState.collectAsState()
+    val message = remoteApiMessage.remoteApiMessage
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -106,37 +117,31 @@ fun FindScreen(navController: NavController, nurseViewModel: NurseViewModel) {
                     tint = colorResource(id = R.color.colorText)
                 )
             }
-            Column(modifier = Modifier.fillMaxSize()) {
-                // Title of the screen
-                HeadingTextComponent("Find by Name")
-                Spacer(modifier = Modifier.height(20.dp))
-                // TextField
-                TextField("Name of nurse", nurseViewModel)
-                Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            TextField("Name of nurse", nurseViewModel)
+            Spacer(modifier = Modifier.height(25.dp))
 
-                // Button that gets disabled if the text field is empty
-                val searchState by nurseViewModel.searchState.collectAsState()
-                ButtonComponent(
-                    value = "Search",
-                    enabled = searchState.nurseName.isNotBlank() // Enable the button only if text is not blank
-                ) {
-                    nurseViewModel.findNurseByName()
-                }
+            ButtonComponent(
+                value = "Search",
+                enabled = searchState.nurseName.isNotBlank()
+            ) {
+                nurseViewModel.findNurseByName()
+            }
+            Spacer(modifier = Modifier.height(20.dp))
 
-                Spacer(modifier = Modifier.height(20.dp))
-                // Display results
-                Text(text = searchState.resultMessage)
+            LaunchedEffect(message) {
+                when (message) {
+                    is RemoteApiMessage.Loading -> Log.d("Test", "Load")
+                    is RemoteApiMessage.Error -> Log.d("Test","ERROR")
+                    is RemoteApiMessage.Success -> {
 
-                // Show data of all the nurse with the same name
-                if (searchState.resultMessage != "Not Found") {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    LazyColumn {
-                        items(searchState.searchResults) { nurse ->
-                            ListSearchNurse(nurse = nurse)
-                        }
                     }
+
+                    else -> {}
                 }
             }
+
+
         }
     }
 }
