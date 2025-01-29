@@ -126,7 +126,7 @@ fun MyAppHomePage(
             )
         }
         composable("profile") {
-            ProfileScreen(navController = navController, nurseViewModel = nurseViewModel)
+            ProfileScreen(navController = navController, nurseViewModel = nurseViewModel, remoteViewModel= remoteViewModel)
         }
     }
 }

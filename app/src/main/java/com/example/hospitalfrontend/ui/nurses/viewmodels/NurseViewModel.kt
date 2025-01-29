@@ -2,9 +2,13 @@ package com.example.hospitalfrontend.ui.nurses.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hospitalfrontend.model.*
-import com.example.hospitalfrontend.network.RemoteViewModel
-import kotlinx.coroutines.flow.*
+import com.example.hospitalfrontend.model.LoginState
+import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.model.SearchState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class NurseViewModel() : ViewModel() {
@@ -98,4 +102,10 @@ class NurseViewModel() : ViewModel() {
         _currentSearchName.value = name
     }
 
+    fun deleteNurse(nurseId: Int) {
+
+        _nurses.value = _nurses.value.filter { it.id != nurseId }
+        disconnectNurse()
+
+    }
 }

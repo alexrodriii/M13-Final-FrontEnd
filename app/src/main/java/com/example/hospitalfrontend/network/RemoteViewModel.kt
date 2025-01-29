@@ -14,7 +14,7 @@ class RemoteViewModel : ViewModel() {
         private set
     var remoteApiListMessage =
         mutableStateOf<RemoteApiMessageListNurse>(RemoteApiMessageListNurse.Loading)
-
+    var remoteApiMessageBoolean = mutableStateOf<RemoteApiMessageBoolean>(RemoteApiMessageBoolean.Loading)
     fun clearApiMessage() {
         remoteApiMessage.value = RemoteApiMessageNurse.Loading
     }
@@ -83,6 +83,22 @@ class RemoteViewModel : ViewModel() {
                 remoteApiMessage.value = RemoteApiMessageNurse.Success(response)
             } catch (e: Exception) {
                 remoteApiMessage.value = RemoteApiMessageNurse.Error
+            }
+        }
+    }
+    fun deleteNurse(nurseId: Int) {
+        viewModelScope.launch {
+            remoteApiMessageBoolean.value = RemoteApiMessageBoolean.Loading
+            try {
+                val connection = Retrofit.Builder().baseUrl("http://10.0.2.2:8080/")
+                    .addConverterFactory(GsonConverterFactory.create()).build()
+
+                val endPoint = connection.create(ApiService::class.java)
+                // Call to the end-point to create a new nurse
+                val response = endPoint.deleteNurse(nurseId)
+                remoteApiMessageBoolean.value = RemoteApiMessageBoolean.Success(response)
+            } catch (e: Exception) {
+                remoteApiMessageBoolean.value = RemoteApiMessageBoolean.Error
             }
         }
     }
