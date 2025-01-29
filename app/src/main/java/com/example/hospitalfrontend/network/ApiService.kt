@@ -2,6 +2,7 @@ package com.example.hospitalfrontend.network
 
 import com.example.hospitalfrontend.model.*
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -18,4 +19,7 @@ interface ApiService {
 
     @POST("nurse")
     suspend fun createNurse(@Body nurse: NurseState): NurseState
+
+    @DELETE("nurse/{id}")
+    suspend fun deleteNurse(@Path("id") id: Int): Boolean
 }
