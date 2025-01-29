@@ -34,6 +34,7 @@ class RemoteViewModel : ViewModel() {
             }
         }
     }
+
     //We do the request to the API
     fun getAllNurses() {
         viewModelScope.launch {
@@ -98,6 +99,21 @@ class RemoteViewModel : ViewModel() {
                 remoteApiMessageBoolean.value = RemoteApiMessageBoolean.Success(response)
             } catch (e: Exception) {
                 remoteApiMessageBoolean.value = RemoteApiMessageBoolean.Error
+            }
+        }
+    }
+
+    fun findByName(nurseName: String) {
+        viewModelScope.launch {
+            remoteApiMessage.value = RemoteApiMessageNurse.Loading
+            try {
+                val connection = Retrofit.Builder().baseUrl("http://10.0.2.2:8080")
+                    .addConverterFactory(GsonConverterFactory.create()).build()
+                val endPoint = connection.create(ApiService::class.java)
+                val response = endPoint.findByName(nurseName)
+                remoteApiMessage.value = RemoteApiMessageNurse.Success(response)
+            } catch (e: Exception) {
+                remoteApiMessage.value = RemoteApiMessageNurse.Error
             }
         }
     }

@@ -22,4 +22,8 @@ interface ApiService {
 
     @DELETE("nurse/{id}")
     suspend fun deleteNurse(@Path("id") id: Int): Boolean
+
+    @GET("nurse/name/{name}")
+    suspend fun findByName(@Path("name") nurseName: String): NurseState
+
 }
