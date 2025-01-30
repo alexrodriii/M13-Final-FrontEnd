@@ -2,39 +2,89 @@ package com.example.hospitalfrontend.ui.nurses.view
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.*
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
+import com.example.hospitalfrontend.network.RemoteApiMessageBoolean
+import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
-import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.theme.Primary
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ProfileScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+fun ProfileScreen(
+    navController: NavController,
+    nurseViewModel: NurseViewModel,
+    remoteViewModel: RemoteViewModel
+) {
+    val remoteApiMessageBoolean = remoteViewModel.remoteApiMessageBoolean.value
+    // State for controller of dialog visibility
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogMessage by rememberSaveable { mutableStateOf("") }
     // Initialize the state for the profile image and the image picker launcher
     var profileImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     val imagePickerLauncher =
@@ -124,6 +174,7 @@ fun ProfileScreen(navController: NavController, nurseViewModel: NurseViewModel) 
                     contentScale = ContentScale.Crop
                 )
 
+
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = displayedProfile,
@@ -192,12 +243,23 @@ fun ProfileScreen(navController: NavController, nurseViewModel: NurseViewModel) 
 
                 // Delete Button
                 Button(
-                    onClick = { TODO() },
+                    onClick = {
+                        val nurseState = nurseViewModel.nurseState.value
+                        val nurseId = nurseState?.id
+                        if (nurseId != null) {
+                            remoteViewModel.deleteNurse(nurseId)
+
+                        }else{
+                            Log.d("Error", "No nurse ID found")
+                        }
+
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
+                )
+                {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
@@ -214,6 +276,43 @@ fun ProfileScreen(navController: NavController, nurseViewModel: NurseViewModel) 
             }
         }
     }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = {
+                Text(text = "ERROR: Delete")
+            },
+            text = {
+                Text(text = dialogMessage)
+            }
+        )
+    }
+    LaunchedEffect(remoteApiMessageBoolean) {
+        when (remoteApiMessageBoolean) {
+            is RemoteApiMessageBoolean.Success -> {
+                val nurseState = nurseViewModel.nurseState.value
+                val nurseId = nurseState?.id
+                if (nurseId != null) {
+                    nurseViewModel.deleteNurse(nurseId)
+                    remoteViewModel.clearApiMessage() // Limpia el estado para evitar mensajes repetidos
+                }
+            }
+
+            is RemoteApiMessageBoolean.Error -> {
+                // Show the message Error
+                dialogMessage = "Error to delete a nurse"
+                showDialog = true
+            }
+
+            RemoteApiMessageBoolean.Loading -> Log.d("Loading", "Delete nurse...")
+        }
+    }
+
 }
 
 @Composable
@@ -373,11 +472,11 @@ fun SpecialityUpdateDropdown(
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun ProfilePreview() {
     HospitalFrontEndTheme {
         val navController = rememberNavController()
         ProfileScreen(navController, nurseViewModel = NurseViewModel())
     }
-}
+}*/
