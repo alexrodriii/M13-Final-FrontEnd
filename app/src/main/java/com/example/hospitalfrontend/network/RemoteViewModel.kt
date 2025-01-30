@@ -1,12 +1,12 @@
 package com.example.hospitalfrontend.network
 
-import android.util.Log
-import retrofit2.Retrofit
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hospitalfrontend.model.*
+import com.example.hospitalfrontend.model.LoginRequest
+import com.example.hospitalfrontend.model.NurseState
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RemoteViewModel : ViewModel() {
@@ -111,6 +111,20 @@ class RemoteViewModel : ViewModel() {
                     .addConverterFactory(GsonConverterFactory.create()).build()
                 val endPoint = connection.create(ApiService::class.java)
                 val response = endPoint.findByName(nurseName)
+                remoteApiMessage.value = RemoteApiMessageNurse.Success(response)
+            } catch (e: Exception) {
+                remoteApiMessage.value = RemoteApiMessageNurse.Error
+            }
+        }
+    }
+    fun updateNurse(nurseId: Int,updateNurse: NurseState ) {
+        viewModelScope.launch {
+            remoteApiMessage.value = RemoteApiMessageNurse.Loading
+            try {
+                val connection = Retrofit.Builder().baseUrl("http://10.0.2.2:8080")
+                    .addConverterFactory(GsonConverterFactory.create()).build()
+                val endPoint = connection.create(ApiService::class.java)
+                val response = endPoint.updateNurse(nurseId, updateNurse)
                 remoteApiMessage.value = RemoteApiMessageNurse.Success(response)
             } catch (e: Exception) {
                 remoteApiMessage.value = RemoteApiMessageNurse.Error
