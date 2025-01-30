@@ -1,10 +1,12 @@
 package com.example.hospitalfrontend.network
 
-import com.example.hospitalfrontend.model.*
+import com.example.hospitalfrontend.model.LoginRequest
+import com.example.hospitalfrontend.model.NurseState
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -25,5 +27,8 @@ interface ApiService {
 
     @GET("nurse/name/{name}")
     suspend fun findByName(@Path("name") nurseName: String): NurseState
+
+    @PUT("nurse/{id}")
+    suspend fun updateNurse(@Path("id") id: Int,@Body updateNurse: NurseState): NurseState
 
 }
