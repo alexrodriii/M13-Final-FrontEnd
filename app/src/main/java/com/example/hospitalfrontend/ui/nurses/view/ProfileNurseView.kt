@@ -69,7 +69,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.hospitalfrontend.R
+import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.network.RemoteApiMessageBoolean
+import com.example.hospitalfrontend.network.RemoteApiMessageNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.Primary
@@ -81,8 +83,10 @@ fun ProfileScreen(
     nurseViewModel: NurseViewModel,
     remoteViewModel: RemoteViewModel
 ) {
+    val messageApi = remoteViewModel.remoteApiMessage.value
     val remoteApiMessageBoolean = remoteViewModel.remoteApiMessageBoolean.value
     // State for controller of dialog visibility
+    var dialogTitle by rememberSaveable { mutableStateOf("") }
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var dialogMessage by rememberSaveable { mutableStateOf("") }
     // Initialize the state for the profile image and the image picker launcher
@@ -110,9 +114,7 @@ fun ProfileScreen(
     val isEmailValid =
         Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").matches(emailValue.value)
 
-    fun isFormValid(): Boolean {
-        return nameValue.value.isNotEmpty() && surnameValue.value.isNotEmpty() && emailValue.value.isNotEmpty() && birthdayValue.value.isNotEmpty() && passwordValue.value.isNotEmpty() && specialityValue.value.isNotEmpty() && isEmailValid
-    }
+
 
     MaterialTheme {
         Box(
@@ -153,15 +155,70 @@ fun ProfileScreen(
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    IconButton(enabled = isFormValid(), onClick = { TODO() }) {
+                    //Update button
+                    IconButton(onClick = {
+                        if (nurseState?.id != null) {
+                            //Update nurse method
+                            val updateNurse = NurseState(
+                                id = nurseState.id ?: 0,
+                                name = nameValue.value,
+                                surname = surnameValue.value,
+                                age = birthdayValue.value,
+                                email = emailValue.value,
+                                password = passwordValue.value,
+                                speciality = specialityValue.value
+                            )
+                            remoteViewModel.updateNurse(nurseState.id, updateNurse)
+                        } else {
+                            Log.d("ERROR", "Nurse ID is null")
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = "Save Change",
-                            tint = if (isFormValid()) Color.Green else Color.Gray,
+                            tint = Color.Green ,
                             modifier = Modifier.size(30.dp)
                         )
                     }
+                    // Mostrar el diálogo si es necesario
+                    if (showDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog = false },
+                            confirmButton = {
+                                TextButton(onClick = { showDialog = false }) {
+                                    Text("OK")
+                                }
+                            },
+                            title = {
+                                Text(text = dialogTitle)
+                            },
+                            text = {
+                                Text(text = dialogMessage)
+                            }
+                        )
+                    }
+
+                    LaunchedEffect(messageApi) {
+                        when (messageApi) {
+                            is RemoteApiMessageNurse.Success -> {
+                                if (nurseState?.id != null) {
+                                    nurseViewModel.updatedNurse(nurseState.id, messageApi.message)
+                                }
+                                remoteViewModel.clearApiMessage() // Change the message to Loading to avoid repeated messages when user is logout
+                            }
+
+                            is RemoteApiMessageNurse.Error -> {
+                                // Show dialog with a specific message
+                                dialogTitle = "ERROR: Update"
+                                dialogMessage = "Error updating data nurse"
+                                showDialog = true // Show the dialog
+                            }
+
+                            RemoteApiMessageNurse.Loading -> Log.d("Loading", "Updating nurse...")
+                        }
+                    }
                 }
+
                 Spacer(modifier = Modifier.height(20.dp))
                 // Profile Picture with click functionality to open the gallery
                 Image(
@@ -248,9 +305,8 @@ fun ProfileScreen(
                         val nurseId = nurseState?.id
                         if (nurseId != null) {
                             remoteViewModel.deleteNurse(nurseId)
-
-                        }else{
-                            Log.d("Error", "No nurse ID found")
+                        } else {
+                            Log.d("Error", "Not found ID nurse")
                         }
 
                     },
@@ -285,7 +341,7 @@ fun ProfileScreen(
                 }
             },
             title = {
-                Text(text = "ERROR: Delete")
+                Text(text = dialogTitle)
             },
             text = {
                 Text(text = dialogMessage)
@@ -299,12 +355,13 @@ fun ProfileScreen(
                 val nurseId = nurseState?.id
                 if (nurseId != null) {
                     nurseViewModel.deleteNurse(nurseId)
-                    remoteViewModel.clearApiMessage() // Limpia el estado para evitar mensajes repetidos
+                    remoteViewModel.clearApiMessage() // Clear the repeat message
                 }
             }
 
             is RemoteApiMessageBoolean.Error -> {
                 // Show the message Error
+                dialogTitle = "ERROR: Delete"
                 dialogMessage = "Error to delete a nurse"
                 showDialog = true
             }

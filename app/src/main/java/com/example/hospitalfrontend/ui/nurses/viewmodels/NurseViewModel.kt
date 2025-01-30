@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hospitalfrontend.model.LoginState
 import com.example.hospitalfrontend.model.NurseState
-import com.example.hospitalfrontend.model.SearchState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -103,9 +102,17 @@ class NurseViewModel() : ViewModel() {
     }
 
     fun deleteNurse(nurseId: Int) {
-
         _nurses.value = _nurses.value.filter { it.id != nurseId }
         disconnectNurse()
-
+    }
+    fun updatedNurse(nurseId: Int, updateNurse: NurseState) {
+      _nurseState.value = updateNurse
+        _nurses.value = _nurses.value.map {
+            if (it.id == nurseId){
+            updateNurse.copy(id=nurseId)
+            }else{
+                it
+            }
+        }
     }
 }
