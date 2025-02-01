@@ -83,6 +83,7 @@ class NurseViewModel() : ViewModel() {
     fun disconnectNurse() {
         setLoginState(false)
         _nurseState.value = null
+        _currentSearchName.value = ""
     }
 
     // Add new Nurse into the list
@@ -101,18 +102,7 @@ class NurseViewModel() : ViewModel() {
         _currentSearchName.value = name
     }
 
-    fun deleteNurse(nurseId: Int) {
-        _nurses.value = _nurses.value.filter { it.id != nurseId }
+    fun deleteNurse() {
         disconnectNurse()
-    }
-    fun updatedNurse(nurseId: Int, updateNurse: NurseState) {
-      _nurseState.value = updateNurse
-        _nurses.value = _nurses.value.map {
-            if (it.id == nurseId){
-            updateNurse.copy(id=nurseId)
-            }else{
-                it
-            }
-        }
     }
 }

@@ -13,7 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
@@ -354,7 +353,7 @@ fun CreateNursePage(
                 remoteViewModel.createNurse(nurse)
             }
 
-            // Mostrar el diálogo si es necesario
+            // Show dialog if it is needed
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
