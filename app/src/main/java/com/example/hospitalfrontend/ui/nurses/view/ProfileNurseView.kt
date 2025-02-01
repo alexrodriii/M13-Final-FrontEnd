@@ -180,7 +180,7 @@ fun ProfileScreen(
                             modifier = Modifier.size(30.dp)
                         )
                     }
-                    // Mostrar el diálogo si es necesario
+                    // Show a pop up
                     if (showDialog) {
                         AlertDialog(
                             onDismissRequest = { showDialog = false },
