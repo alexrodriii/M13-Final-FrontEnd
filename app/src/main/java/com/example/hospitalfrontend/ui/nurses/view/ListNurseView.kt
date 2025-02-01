@@ -69,7 +69,14 @@ fun ListNurseScreen(
                 contentDescription = "Close Button", tint = colorResource(id = R.color.colorText)
             )
         }
-
+        Column {
+            Text(
+                "List of Nurse",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
+                style = MaterialTheme.typography.headlineLarge
+            )
+        }
         // LazyColumn for listing nurses
         LazyColumn(
             modifier = Modifier.fillMaxSize(), // Fill the rest of the screen

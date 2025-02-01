@@ -113,7 +113,7 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp)
+                    .padding(top = 20.dp)
             ) {
                 ProfileHeader(
                     navController,
