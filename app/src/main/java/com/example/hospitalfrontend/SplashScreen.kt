@@ -33,17 +33,17 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 val Poppins = FontFamily(
-    Font(R.font.happy_town, FontWeight.Normal)
+    Font(R.font.happy, FontWeight.Normal)
 )
 @Composable
 fun SplashScreen(onSplashFinished: () -> Unit) {
     var isVisible by remember { mutableStateOf(false) }
 
-    // Inicia la animación tras un pequeño retraso
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(true) {
         delay(500)
         isVisible = true
-        delay(4000) // Espera unos segundos con la animación activa
+        delay(4000)
         onSplashFinished()
     }
 
@@ -77,7 +77,7 @@ fun Splash(isVisible: Boolean) {
                 painter = painterResource(id = R.drawable.logo_hospital_app),
                 contentDescription = "Logo Hospital",
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(300.dp)
                     .alpha(alphaLogo)
             )
 

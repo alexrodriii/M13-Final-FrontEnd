@@ -30,7 +30,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.hospitalfrontend.navigation.AppNavigation
 import com.example.hospitalfrontend.network.RemoteApiMessageListNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
@@ -48,13 +47,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
             HospitalFrontEndTheme {
-                AppNavigation(nurseViewModel, remoteViewModel)
-                /*MyAppHomePage(
+                //AppNavigation(nurseViewModel, remoteViewModel)
+                MyAppHomePage(
                     nurseViewModel = NurseViewModel(), remoteViewModel = RemoteViewModel()
-                )*/
-
+                )
             }
         }
     }
@@ -88,6 +85,7 @@ fun MyAppHomePage(
     val startDestination = if (loginState.isLogin) "home" else "login"
 
     NavHost(navController = navController, startDestination = startDestination) {
+
         composable("create") {
             CreateNursePage(
                 navController = navController,

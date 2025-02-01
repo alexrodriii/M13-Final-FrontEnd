@@ -1,6 +1,8 @@
 package com.example.hospitalfrontend.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,11 +16,12 @@ fun AppNavigation(
     nurseViewModel: NurseViewModel,
     remoteViewModel: RemoteViewModel
 ) {
+    val loginState by nurseViewModel.loginState.collectAsState()
     val navController = rememberNavController()
-
+    val startDestination = if (loginState.isLogin) "home" else "login"
     NavHost(
         navController = navController,
-        startDestination = AppScreen.SplashScreen.route
+        startDestination = startDestination
     ) {
         composable(AppScreen.SplashScreen.route) {
             SplashScreen {
@@ -30,6 +33,7 @@ fun AppNavigation(
         composable(AppScreen.LoginOrRegisterScreen.route) {
             LoginOrRegisterScreen(navController, nurseViewModel, remoteViewModel)
         }
+
     }
 }
 

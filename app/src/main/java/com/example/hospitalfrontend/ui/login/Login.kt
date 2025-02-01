@@ -86,6 +86,7 @@ fun HospitalLoginScreen(
 fun LoginOrRegisterScreen(
     navController: NavController, nurseViewModel: NurseViewModel, remoteViewModel: RemoteViewModel
 ) {
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
