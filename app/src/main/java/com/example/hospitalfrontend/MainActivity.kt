@@ -1,5 +1,6 @@
 package com.example.hospitalfrontend
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -63,14 +64,12 @@ class MainActivity : ComponentActivity() {
 fun HomePage() {
     HospitalFrontEndTheme {
         MyAppHomePage(
-            nurseViewModel = NurseViewModel(),
-            remoteViewModel = RemoteViewModel()
+            nurseViewModel = NurseViewModel(), remoteViewModel = RemoteViewModel()
         )
     }
 }
 
 @Composable
-
 fun MyAppHomePage(
     nurseViewModel: NurseViewModel, remoteViewModel: RemoteViewModel
 ) {
@@ -83,6 +82,14 @@ fun MyAppHomePage(
 
     // Determines the initial screen according to the authentication status
     val startDestination = if (loginState.isLogin) "home" else "login"
+
+    LaunchedEffect(loginState.isLogin) {
+        if (!loginState.isLogin) {
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
+            }
+        }
+    }
 
     NavHost(navController = navController, startDestination = startDestination) {
 
@@ -102,10 +109,7 @@ fun MyAppHomePage(
             )
         }
         composable("home") {
-            HomeScreen(
-                navController = navController,
-                nurseViewModel = nurseViewModel
-            )
+            HomeScreen(navController = navController)
         }
         composable("list") {
             //Variable for the error
@@ -134,7 +138,8 @@ fun MyAppHomePage(
             ListNurseScreen(
                 navController = navController,
                 nurseViewModel = nurseViewModel,
-                isError = isError
+                isError = isError,
+                remoteViewModel = remoteViewModel
             )
         }
         composable("login") {
@@ -145,13 +150,19 @@ fun MyAppHomePage(
             )
         }
         composable("profile") {
-            ProfileScreen(navController = navController, nurseViewModel = nurseViewModel, remoteViewModel= remoteViewModel)
+            ProfileScreen(
+                navController = navController,
+                nurseViewModel = nurseViewModel,
+                remoteViewModel = remoteViewModel
+            )
         }
     }
 }
 
 @Composable
-fun HomeScreen(navController: NavController, nurseViewModel: NurseViewModel) {
+fun HomeScreen(
+    navController: NavController,
+) {
     val options = listOf("Find", "List", "Profile") // Show Find and List when logged in
 
     Column(

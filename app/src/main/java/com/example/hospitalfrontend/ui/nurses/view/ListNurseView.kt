@@ -4,27 +4,33 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.remember
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.*
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
-import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 
 @Composable
-fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel, isError: MutableState<Boolean>) {
+fun ListNurseScreen(
+    navController: NavController,
+    nurseViewModel: NurseViewModel,
+    isError: MutableState<Boolean>,
+    remoteViewModel: RemoteViewModel
+) {
     val nurses by nurseViewModel.nurses.collectAsState()
     //Pop up error
     if (isError.value) {
@@ -36,7 +42,7 @@ fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel
                 }
             },
             title = {
-                Text(text = "Error: List Nurse", color= Color.Red)
+                Text(text = "Error: List Nurse", color = Color.Red)
             },
             text = {
                 Text(text = "Failing into fetching data of list nurses")
@@ -63,23 +69,33 @@ fun ListNurseScreen(navController: NavController, nurseViewModel: NurseViewModel
                 contentDescription = "Close Button", tint = colorResource(id = R.color.colorText)
             )
         }
-
+        Column {
+            Text(
+                "List of Nurse",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
+                style = MaterialTheme.typography.headlineLarge
+            )
+        }
         // LazyColumn for listing nurses
         LazyColumn(
             modifier = Modifier.fillMaxSize(), // Fill the rest of the screen
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 40.dp)
         ) {
             items(items = nurses, itemContent = { nurse ->
-                NurseListItem(nurse = nurse)
+                NurseListItem(nurse = nurse, remoteViewModel)
             })
         }
     }
 }
+
 @Composable
-fun NurseListItem(nurse: NurseState) {
+fun NurseListItem(nurse: NurseState, remoteViewModel: RemoteViewModel) {
     val age by remember(nurse.age) { // Calculate age only when nurse.age changes
         mutableIntStateOf(calculateAge(nurse.age))
     }
+    val profileImageBitmap = remoteViewModel.getCachedPhoto(nurse.id)
+
     Card(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
@@ -89,13 +105,23 @@ fun NurseListItem(nurse: NurseState) {
         Row(
             modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.nurse_profile),
-                contentDescription = "Image Profile",
-                modifier = Modifier.size(50.dp)
-
-            )
+            if (profileImageBitmap != null) {
+                Image(
+                    bitmap = profileImageBitmap.asImageBitmap(),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.nurse_profile),
+                    contentDescription = "Default Profile Image",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                )
+            }
 
             Column(
                 modifier = Modifier
@@ -125,18 +151,3 @@ fun calculateAge(birthDate: String): Int {
         0 // Default to 0 if there's an error
     }
 }
-
-
-/* Preview
-@Preview(showBackground = true)
-@Composable
-fun ListPage() {
-    HospitalFrontEndTheme {
-        val navController = rememberNavController()
-
-        ListNurseScreen(
-            navController, nurseViewModel = NurseViewModel()
-        )
-    }
-}*/
-
