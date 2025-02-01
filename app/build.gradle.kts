@@ -80,6 +80,5 @@ dependencies {
 
     //Splash screen
     implementation(libs.androidx.navigation.compose.v277)
-
-
+    implementation(libs.coil.compose.v222)
 }
