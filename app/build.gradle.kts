@@ -77,4 +77,5 @@ dependencies {
     // Allow to select images
     implementation (libs.accompanist.permissions)
     implementation (libs.androidx.activity.ktx.v131)
+    implementation(libs.coil.compose.v222)
 }
