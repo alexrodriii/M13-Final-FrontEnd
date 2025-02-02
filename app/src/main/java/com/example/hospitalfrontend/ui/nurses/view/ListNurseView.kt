@@ -32,7 +32,15 @@ fun ListNurseScreen(
     remoteViewModel: RemoteViewModel
 ) {
     val nurses by nurseViewModel.nurses.collectAsState()
-    //Pop up error
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(nurses) {
+        if (nurses.isNotEmpty()) {
+            isLoading = false
+        }
+    }
+
+    // Pop up error
     if (isError.value) {
         AlertDialog(
             onDismissRequest = { isError.value = false },
@@ -41,50 +49,44 @@ fun ListNurseScreen(
                     Text("OK")
                 }
             },
-            title = {
-                Text(text = "Error: List Nurse", color = Color.Red)
-            },
-            text = {
-                Text(text = "Failing into fetching data of list nurses")
-            }
+            title = { Text(text = "Error: List Nurse", color = Color.Red) },
+            text = { Text(text = "Failing into fetching data of list nurses") }
         )
     }
 
-    // Use a Box to stack the back button and LazyColumn
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 20.dp)
+            .padding(top = 20.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // Back button at the top-right
+        // Show indicator while loading
+        if (isLoading) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        } else {
+            // LazyColumn to show the list of nurses
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 40.dp)
+            ) {
+                items(items = nurses) { nurse ->
+                    NurseListItem(nurse = nurse, remoteViewModel)
+                }
+            }
+        }
+
+        // Button to close, and return to home screen
         IconButton(
-            onClick = {
-                navController.popBackStack()
-            }, modifier = Modifier
-                .align(Alignment.TopEnd) // Position at top-right
-                .zIndex(1f) // Ensures this is above LazyColumn
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .zIndex(1f) // It is always on top of the list
         ) {
             Icon(
-                imageVector = Icons.Filled.Close, // Example icon
-                contentDescription = "Close Button", tint = colorResource(id = R.color.colorText)
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close Button",
+                tint = colorResource(id = R.color.colorText)
             )
-        }
-        Column {
-            Text(
-                "List of Nurse",
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.headlineLarge
-            )
-        }
-        // LazyColumn for listing nurses
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(), // Fill the rest of the screen
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 40.dp)
-        ) {
-            items(items = nurses, itemContent = { nurse ->
-                NurseListItem(nurse = nurse, remoteViewModel)
-            })
         }
     }
 }
