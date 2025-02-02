@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class NurseViewModel() : ViewModel() {
+class NurseViewModel : ViewModel() {
     // Login variables
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> get() = _loginState.asStateFlow()
@@ -102,19 +102,7 @@ class NurseViewModel() : ViewModel() {
         _currentSearchName.value = name
     }
 
-    fun deleteNurse(nurseId: Int) {
-        _nurses.value = _nurses.value.filter { it.id != nurseId }
+    fun deleteNurse() {
         disconnectNurse()
     }
-    fun updatedNurse(nurseId: Int, updateNurse: NurseState) {
-        _nurseState.value = updateNurse
-        _nurses.value = _nurses.value.map {
-            if (it.id == nurseId){
-                updateNurse.copy(id=nurseId)
-            }else{
-                it
-            }
-        }
-    }
-
 }
