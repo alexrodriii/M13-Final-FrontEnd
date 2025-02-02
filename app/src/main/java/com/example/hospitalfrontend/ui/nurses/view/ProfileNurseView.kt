@@ -1,8 +1,10 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,6 +33,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -43,7 +47,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,21 +62,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.network.RemoteApiMessageBoolean
 import com.example.hospitalfrontend.network.RemoteApiMessageNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
+import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.theme.Primary
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -83,27 +93,22 @@ fun ProfileScreen(
     nurseViewModel: NurseViewModel,
     remoteViewModel: RemoteViewModel
 ) {
-    val messageApi = remoteViewModel.remoteApiMessage.value
-    val remoteApiMessageBoolean = remoteViewModel.remoteApiMessageBoolean.value
-    // State for controller of dialog visibility
-    var dialogTitle by rememberSaveable { mutableStateOf("") }
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-    var dialogMessage by rememberSaveable { mutableStateOf("") }
-    // Initialize the state for the profile image and the image picker launcher
+    val nurseState = nurseViewModel.nurseState.value
+
+    var profileImageBitmap by rememberSaveable { mutableStateOf<Bitmap?>(null) }
     var profileImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(nurseState?.id) {
+        nurseState?.id?.let { id ->
+            profileImageBitmap = remoteViewModel.getPhotoById(id)
+        }
+    }
+
     val imagePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                profileImageUri = it
-            }
+            uri?.let { profileImageUri = it }
         }
 
-    // Retrieving nurse details from the ViewModel
-    val nurseState = nurseViewModel.nurseState.value
-    val displayedProfile = "${nurseState?.name} ${nurseState?.surname}"
-    val displayedEmail = nurseState?.email ?: ""
-
-    // Form fields state
     val nameValue = rememberSaveable { mutableStateOf(nurseState?.name ?: "") }
     val surnameValue = rememberSaveable { mutableStateOf(nurseState?.surname ?: "") }
     val emailValue = rememberSaveable { mutableStateOf(nurseState?.email ?: "") }
@@ -111,10 +116,28 @@ fun ProfileScreen(
     val specialityValue = rememberSaveable { mutableStateOf(nurseState?.speciality ?: "") }
     val passwordValue = rememberSaveable { mutableStateOf("") }
 
-    val isEmailValid =
-        Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").matches(emailValue.value)
+    var showSuccessDialog by rememberSaveable { mutableStateOf(false) }
+    var showErrorDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogMessage by rememberSaveable { mutableStateOf("") }
 
+    val remoteApiMessageUploadPhoto = remoteViewModel.remoteApiMessageUploadPhoto.value
 
+    LaunchedEffect(remoteApiMessageUploadPhoto) {
+        when (remoteApiMessageUploadPhoto) {
+            is RemoteApiMessageBoolean.Success -> {
+                dialogMessage = "Photo uploaded successfully."
+                showSuccessDialog = true
+                remoteViewModel.clearApiMessage()
+            }
+
+            is RemoteApiMessageBoolean.Error -> {
+                dialogMessage = "Failing to upload photo."
+                showErrorDialog = true
+                remoteViewModel.clearApiMessage()
+            }
+
+        }
+    }
 
     MaterialTheme {
         Box(
@@ -122,7 +145,10 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFF8282E1), Color(0xFFFFFFFF))
+                        colors = listOf(
+                            Color(0xFF8282E1),
+                            Color(0xFFFFFFFF)
+                        )
                     )
                 )
         ) {
@@ -132,244 +158,310 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .padding(top = 30.dp)
             ) {
-                // Back Button and Title
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
-                    Text(
-                        text = "Profile",
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    //Update button
-                    IconButton(onClick = {
-                        if (nurseState?.id != null) {
-                            //Update nurse method
-                            val updateNurse = NurseState(
-                                id = nurseState.id ?: 0,
-                                name = nameValue.value,
-                                surname = surnameValue.value,
-                                age = birthdayValue.value,
-                                email = emailValue.value,
-                                password = passwordValue.value,
-                                speciality = specialityValue.value
-                            )
-                            remoteViewModel.updateNurse(nurseState.id, updateNurse)
-                        } else {
-                            Log.d("ERROR", "Nurse ID is null")
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Save,
-                            contentDescription = "Save Change",
-                            tint = Color.Green ,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                    // Show a pop up
-                    if (showDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showDialog = false },
-                            confirmButton = {
-                                TextButton(onClick = { showDialog = false }) {
-                                    Text("OK")
-                                }
-                            },
-                            title = {
-                                Text(text = dialogTitle)
-                            },
-                            text = {
-                                Text(text = dialogMessage)
-                            }
-                        )
-                    }
-
-                    LaunchedEffect(messageApi) {
-                        when (messageApi) {
-                            is RemoteApiMessageNurse.Success -> {
-                                if (nurseState?.id != null) {
-                                    nurseViewModel.updatedNurse(nurseState.id, messageApi.message)
-                                }
-                                remoteViewModel.clearApiMessage() // Change the message to Loading to avoid repeated messages when user is logout
-                            }
-
-                            is RemoteApiMessageNurse.Error -> {
-                                // Show dialog with a specific message
-                                dialogTitle = "ERROR: Update"
-                                dialogMessage = "Error updating data nurse"
-                                showDialog = true // Show the dialog
-                            }
-
-                            RemoteApiMessageNurse.Loading -> Log.d("Loading", "Updating nurse...")
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-                // Profile Picture with click functionality to open the gallery
-                Image(
-                    painter = painterResource(R.drawable.icon_user),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .clickable { imagePickerLauncher.launch("image/*") }, // Open the gallery
-                    contentScale = ContentScale.Crop
+                ProfileHeader(
+                    navController,
+                    nurseState,
+                    nameValue,
+                    surnameValue,
+                    birthdayValue,
+                    emailValue,
+                    passwordValue,
+                    specialityValue,
+                    remoteViewModel
                 )
-
-
+                Spacer(modifier = Modifier.height(16.dp))
+                ProfileImage(
+                    profileImageUri,
+                    profileImageBitmap,
+                    imagePickerLauncher,
+                    nurseState,
+                    remoteViewModel,
+                )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = displayedProfile,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = displayedEmail,
-                    fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-
+                ProfileDetails(nurseState)
                 Spacer(modifier = Modifier.height(10.dp))
-                MyTextUpdateField(
-                    labelValue = "Name",
-                    icon = (Icons.Default.Person),
-                    textValue = nameValue
+                ProfileForm(
+                    nameValue,
+                    surnameValue,
+                    emailValue,
+                    birthdayValue,
+                    passwordValue,
+                    specialityValue,
+                    nurseViewModel
                 )
-                MyTextUpdateField(
-                    labelValue = "Surname",
-                    icon = (Icons.Default.Person),
-                    textValue = surnameValue
-                )
-                MyTextUpdateField(
-                    labelValue = "Email",
-                    icon = (Icons.Default.Email),
-                    textValue = emailValue
-                )
-                DateTextUpdateField(
-                    labelValue = "Birthday",
-                    icon = (Icons.Default.Today),
-                    dateValue = birthdayValue
-                )
-                PasswordTextUpdateField(
-                    labelValue = "Password",
-                    icon = (Icons.Default.Password),
-                    passwordValue = passwordValue
-                )
-                SpecialityUpdateDropdown(nurseViewModel, specialityValue)
                 Spacer(modifier = Modifier.height(20.dp))
-
-                // LogOut Button
-                Button(
-                    onClick = {
-                        nurseViewModel.disconnectNurse()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "LogOut",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "LogOut",
-                        fontSize = 18.sp,
-                        color = Color.White
-                    )
-                }
-
-                // Delete Button
-                Button(
-                    onClick = {
-                        val nurseState = nurseViewModel.nurseState.value
-                        val nurseId = nurseState?.id
-                        if (nurseId != null) {
-                            remoteViewModel.deleteNurse(nurseId)
-                        } else {
-                            Log.d("Error", "Not found ID nurse")
-                        }
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ProfileActions(remoteViewModel, nurseViewModel, nurseState)
+                SuccessDialog(
+                    showDialog = showSuccessDialog,
+                    message = dialogMessage,
+                    onDismiss = { showSuccessDialog = false }
                 )
-                {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Delete",
-                        fontSize = 18.sp,
-                        color = Color.White
-                    )
-                }
+                ErrorDialog(
+                    showDialog = showErrorDialog,
+                    message = dialogMessage,
+                    onDismiss = { showErrorDialog = false }
+                )
             }
         }
     }
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("OK")
+}
+
+
+@Composable
+fun ProfileHeader(
+    navController: NavController,
+    nurseState: NurseState?,
+    nameValue: MutableState<String>,
+    surnameValue: MutableState<String>,
+    birthdayValue: MutableState<String>,
+    emailValue: MutableState<String>,
+    passwordValue: MutableState<String>,
+    specialityValue: MutableState<String>,
+    remoteViewModel: RemoteViewModel,
+) {
+    val remoteApiMessage = remoteViewModel.remoteApiMessage.value
+    var showSuccessDialog by rememberSaveable { mutableStateOf(false) }
+    var showErrorDialog by rememberSaveable { mutableStateOf(false) }
+    var dialogMessage by rememberSaveable { mutableStateOf("") }
+
+    val isEmailValid =
+        Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$").matches(emailValue.value)
+
+    fun isFormValid(): Boolean {
+        return nameValue.value.isNotEmpty() && surnameValue.value.isNotEmpty() && emailValue.value.isNotEmpty() && birthdayValue.value.isNotEmpty() && passwordValue.value.isNotEmpty() && specialityValue.value.isNotEmpty() && isEmailValid
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(onClick = { navController.popBackStack() }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Text(text = "Profile", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        IconButton(enabled = isFormValid(), onClick = {
+            if (nurseState?.id != null) {
+                val updateNurse = NurseState(
+                    id = nurseState.id,
+                    name = nameValue.value,
+                    surname = surnameValue.value,
+                    age = birthdayValue.value,
+                    email = emailValue.value,
+                    password = passwordValue.value,
+                    speciality = specialityValue.value
+                )
+                remoteViewModel.updateNurse(nurseState.id, updateNurse)
+            }
+        }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Save,
+                contentDescription = "Save Change",
+                tint = if (isFormValid()) Color.Green else Color.LightGray,
+                modifier = Modifier.size(30.dp)
+            )
+        }
+        LaunchedEffect(remoteApiMessage) {
+            when (remoteApiMessage) {
+                is RemoteApiMessageNurse.Success -> {
+                    dialogMessage = "Data updated successfully."
+                    showSuccessDialog = true
+                    remoteViewModel.clearApiMessage()
                 }
-            },
+
+                is RemoteApiMessageNurse.Error -> {
+                    dialogMessage = "Failing to update data."
+                    showErrorDialog = true
+                    remoteViewModel.clearApiMessage()
+                }
+
+                RemoteApiMessageNurse.Loading -> Log.d("Loading Update", "Loading")
+            }
+        }
+        SuccessDialog(
+            showDialog = showSuccessDialog,
+            message = dialogMessage,
+            onDismiss = { showSuccessDialog = false }
+        )
+        ErrorDialog(
+            showDialog = showErrorDialog,
+            message = dialogMessage,
+            onDismiss = { showErrorDialog = false }
+        )
+    }
+}
+
+
+@Composable
+fun ProfileImage(
+    profileImageUri: Uri?,
+    profileImageBitmap: Bitmap?,
+    imagePickerLauncher: ManagedActivityResultLauncher<String, Uri?>,
+    nurseState: NurseState?,
+    remoteViewModel: RemoteViewModel,
+) {
+    val context = LocalContext.current
+    val imageToShow = profileImageUri?.let { rememberAsyncImagePainter(it) }
+        ?: profileImageBitmap?.let { BitmapPainter(it.asImageBitmap()) }
+        ?: painterResource(R.drawable.nurse_profile)
+
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Image(
+            painter = imageToShow,
+            contentDescription = "Profile Picture",
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .clickable { imagePickerLauncher.launch("image/*") },
+            contentScale = ContentScale.Crop
+        )
+
+        Box(modifier = Modifier.offset(x = 85.dp)) {
+            IconButton(
+                enabled = profileImageUri != null,
+                onClick = {
+                    profileImageUri?.let { uri ->
+                        nurseState?.id?.let { id ->
+                            remoteViewModel.uploadPhoto(id, uri, context)
+                        }
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SaveAs,
+                    contentDescription = "Save Image",
+                    tint = Color.Black,
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ProfileDetails(nurseState: NurseState?) {
+    Text(
+        text = "${nurseState?.name} ${nurseState?.surname}",
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.White
+    )
+    Text(text = nurseState?.email ?: "", fontSize = 16.sp, color = Color.White.copy(alpha = 0.8f))
+}
+
+@Composable
+fun ProfileForm(
+    nameValue: MutableState<String>,
+    surnameValue: MutableState<String>,
+    emailValue: MutableState<String>,
+    birthdayValue: MutableState<String>,
+    passwordValue: MutableState<String>,
+    specialityValue: MutableState<String>,
+    nurseViewModel: NurseViewModel
+) {
+    MyTextUpdateField(labelValue = "Name", icon = Icons.Default.Person, textValue = nameValue)
+    MyTextUpdateField(
+        labelValue = "Surname",
+        icon = Icons.Default.Person,
+        textValue = surnameValue
+    )
+    MyTextUpdateField(labelValue = "Email", icon = Icons.Default.Email, textValue = emailValue)
+    DateTextUpdateField(
+        labelValue = "Birthday",
+        icon = Icons.Default.Today,
+        dateValue = birthdayValue
+    )
+    PasswordTextUpdateField(
+        labelValue = "Password",
+        icon = Icons.Default.Password,
+        passwordValue = passwordValue
+    )
+    SpecialityUpdateDropdown(nurseViewModel, specialityValue)
+}
+
+@Composable
+fun ProfileActions(
+    remoteViewModel: RemoteViewModel,
+    nurseViewModel: NurseViewModel,
+    nurseState: NurseState?,
+) {
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+
+    Button(
+        onClick = { nurseViewModel.disconnectNurse() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Primary)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Logout,
+            contentDescription = "LogOut",
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = "LogOut", fontSize = 18.sp, color = Color.White)
+    }
+    Button(
+        onClick = {
+            showDeleteDialog = true
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = "Delete",
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = "Delete", fontSize = 18.sp, color = Color.White)
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
             title = {
-                Text(text = dialogTitle)
+                Text(text = "Confirm Deletion")
             },
             text = {
-                Text(text = dialogMessage)
+                Text(text = "Are you sure you want to delete your account?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        remoteViewModel.deleteNurse(nurseState!!.id)
+                        remoteViewModel.clearApiMessage()
+                        nurseViewModel.deleteNurse()
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
             }
         )
     }
-    LaunchedEffect(remoteApiMessageBoolean) {
-        when (remoteApiMessageBoolean) {
-            is RemoteApiMessageBoolean.Success -> {
-                val nurseState = nurseViewModel.nurseState.value
-                val nurseId = nurseState?.id
-                if (nurseId != null) {
-                    nurseViewModel.deleteNurse(nurseId)
-                    remoteViewModel.clearApiMessage() // Clear the repeat message
-                }
-            }
-
-            is RemoteApiMessageBoolean.Error -> {
-                // Show the message Error
-                dialogTitle = "ERROR: Delete"
-                dialogMessage = "Error to delete a nurse"
-                showDialog = true
-            }
-
-            RemoteApiMessageBoolean.Loading -> Log.d("Loading", "Delete nurse...")
-        }
-    }
-
 }
 
 @Composable
@@ -529,11 +621,56 @@ fun SpecialityUpdateDropdown(
     }
 }
 
-/*@Preview(showBackground = true)
+@Composable
+fun SuccessDialog(
+    showDialog: Boolean,
+    message: String,
+    onDismiss: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("Success") },
+            text = { Text(message) },
+            confirmButton = {
+                Button(onClick = onDismiss) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ErrorDialog(
+    showDialog: Boolean,
+    message: String,
+    onDismiss: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("Error") },
+            text = { Text(message) },
+            confirmButton = {
+                Button(onClick = onDismiss) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
 @Composable
 fun ProfilePreview() {
     HospitalFrontEndTheme {
         val navController = rememberNavController()
-        ProfileScreen(navController, nurseViewModel = NurseViewModel())
+        ProfileScreen(
+            navController,
+            nurseViewModel = NurseViewModel(),
+            remoteViewModel = RemoteViewModel()
+        )
     }
-}*/
+}
