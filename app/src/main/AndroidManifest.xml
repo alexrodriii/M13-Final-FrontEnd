@@ -12,6 +12,7 @@
         android:icon="@mipmap/ic_logo_hospital"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_logo_hospital_round"
+
         android:supportsRtl="true"
         android:theme="@style/Theme.HospitalFrontEnd"
         android:usesCleartextTraffic="true"
