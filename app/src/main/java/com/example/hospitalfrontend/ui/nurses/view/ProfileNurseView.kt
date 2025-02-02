@@ -394,7 +394,6 @@ fun ProfileActions(
     nurseState: NurseState?,
 ) {
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-    var deletionError by rememberSaveable { mutableStateOf<String?>(null) }
 
     Button(
         onClick = { nurseViewModel.disconnectNurse() },
