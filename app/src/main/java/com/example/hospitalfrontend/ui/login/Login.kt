@@ -105,7 +105,7 @@ fun LoginOrRegisterScreen(
     }
 }
 
-@Composable
+/*@Composable
 fun ToggleLoginRegisterText(navController: NavController) {
 
     Row(
@@ -117,7 +117,7 @@ fun ToggleLoginRegisterText(navController: NavController) {
                 .clickable { navController.navigate("create") }
                 .padding(start = 5.dp))
     }
-}
+}*/
 
 //This function is only for the image
 @Composable
@@ -138,9 +138,11 @@ fun UserForm(
     // State for controller of dialog visibility
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var dialogMessage by rememberSaveable { mutableStateOf("") }
-
+    val nurseNumber = rememberSaveable {
+        mutableStateOf("")
+    }
     //Create variables for the form
-    val email = rememberSaveable {
+    /*val email = rememberSaveable {
         mutableStateOf("")
     }
     val password = rememberSaveable {
@@ -149,33 +151,36 @@ fun UserForm(
     //If the password is visible or not
     val passwordVisible = rememberSaveable {
         mutableStateOf(false)
-    }
+    }*/
 
     //To hide the login button
-    val isValid = rememberSaveable(email.value, password.value) {
+    val isValid = rememberSaveable(nurseNumber.value) {
         //trims() to remove the white space and .isNotEmpty for that isn't empty
-        email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
+        nurseNumber.value.trim().isNotEmpty()
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         //The text field email
-        EmailInput(
+        /*EmailInput(
             emailState = email
         )
         //The text field password
         PasswordInput(
             passwordState = password, labelId = "Password", passwordVisible = passwordVisible
+        )*/
+        NurseNumberInput(
+            nurseNumberState = nurseNumber
         )
 
         Spacer(modifier = Modifier.height(20.dp))
         // Go to register screen
-        ToggleLoginRegisterText(navController)
+        //ToggleLoginRegisterText(navController)
         Spacer(modifier = Modifier.height(50.dp))
 
         SubmitButton(
             textId = "Login", inputValid = isValid
         ) {
-            val dataLogin = LoginRequest(email.value, password.value)
+            val dataLogin = LoginRequest(nurseNumber.value.toInt())
             remoteViewModel.loginNurse(dataLogin)
         }
 
@@ -210,7 +215,7 @@ fun UserForm(
 
                 is RemoteApiMessageNurse.Error -> {
                     // Show dialog with a specific message
-                    dialogMessage = "Incorrect Email or Password"
+                    dialogMessage = "Incorrect NurseNumber"
                     showDialog = true // Show the dialog
                 }
 
@@ -252,6 +257,18 @@ fun SubmitButton(
 }
 
 @Composable
+fun NurseNumberInput(
+    nurseNumberState: MutableState<String>,
+    labelId: String = "Nurse Number"
+) {
+    InputField(
+        valueState = nurseNumberState,
+        labelId = labelId,
+        keyboardType = KeyboardType.Number
+    )
+}
+
+/*@Composable
 fun PasswordInput(
     passwordState: MutableState<String>, labelId: String, passwordVisible: MutableState<Boolean>
 ) {
@@ -316,7 +333,7 @@ fun EmailInput(
         @ sign appears when the nurse enters her e-mail.*/
         keyboardType = KeyboardType.Email
     )
-}
+}*/
 
 //This function is for the layout of the texts fields.
 @Composable
