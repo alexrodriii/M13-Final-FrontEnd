@@ -14,6 +14,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
@@ -91,6 +92,9 @@ fun MyAppHomePage(
         composable("home") {
             HomeScreen(navController = navController)
         }
+        composable("diagnosis") {
+            DiagnosisScreen(viewModel = nurseViewModel)
+        }
         composable("list") {
             //Variable for the error
             val isError = remember { mutableStateOf(false) }
@@ -143,7 +147,7 @@ fun MyAppHomePage(
 fun HomeScreen(
     navController: NavController,
 ) {
-    val options = listOf("Find", "List", "Profile") // Show Find and List when logged in
+    val options = listOf("Find", "List", "Profile", "diagnosis") // Show Find and List when logged in
 
     Column(
         modifier = Modifier.fillMaxSize(),
