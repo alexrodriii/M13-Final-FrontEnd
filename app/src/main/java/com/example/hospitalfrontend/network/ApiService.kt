@@ -2,6 +2,7 @@ package com.example.hospitalfrontend.network
 
 import com.example.hospitalfrontend.model.LoginRequest
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.model.PatientState
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -20,6 +21,9 @@ interface ApiService {
 
     @GET("nurse")
     suspend fun getAll(): List<NurseState>
+
+    @GET("nurse/patient")
+    suspend fun getAllPatients(): List<PatientState>
 
     @POST("nurse/login")
     suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState
