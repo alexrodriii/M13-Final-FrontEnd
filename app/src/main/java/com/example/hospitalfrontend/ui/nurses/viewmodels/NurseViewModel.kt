@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.hospitalfrontend.model.Diagnosis
 import com.example.hospitalfrontend.model.LoginState
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.model.PatientState
 import com.example.hospitalfrontend.network.ApiService
 import com.example.hospitalfrontend.network.RemoteViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,11 @@ class NurseViewModel : ViewModel() {
     // List of nurse specialties
     private val _specialityNurse = MutableStateFlow<List<String>>(emptyList())
     val specialityNurse: StateFlow<List<String>> = _specialityNurse
+
+   private val _patientstate = MutableStateFlow<List<PatientState>>(emptyList())
+    val patientState: StateFlow<List<PatientState>> = _patientstate
+
+
 
     // Variable for search nurse
     private val _currentSearchName = MutableStateFlow("")

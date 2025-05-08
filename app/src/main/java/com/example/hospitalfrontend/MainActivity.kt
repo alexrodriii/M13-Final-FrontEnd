@@ -20,8 +20,9 @@ import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.hospitalfrontend.network.RemoteApiMessageListNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
-import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
 import com.example.hospitalfrontend.ui.nurses.view.*
+import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
+
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 
@@ -91,10 +92,18 @@ fun MyAppHomePage(
         }
         composable("home") {
             HomeScreen(navController = navController)
+
         }
+        composable("patient") {
+            PatientListView(remoteViewModel = remoteViewModel)
+        }
+
+
+
         composable("diagnosis") {
             DiagnosisScreen(viewModel = nurseViewModel)
         }
+
         composable("list") {
             //Variable for the error
             val isError = remember { mutableStateOf(false) }
@@ -147,7 +156,9 @@ fun MyAppHomePage(
 fun HomeScreen(
     navController: NavController,
 ) {
-    val options = listOf("Find", "List", "Profile", "diagnosis") // Show Find and List when logged in
+
+    val options = listOf("Find", "List", "Profile", "diagnosis", "Patient") // Show Find and List when logged in
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
