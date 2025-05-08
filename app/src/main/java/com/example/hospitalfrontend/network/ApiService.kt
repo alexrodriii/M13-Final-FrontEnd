@@ -1,5 +1,6 @@
 package com.example.hospitalfrontend.network
 
+import com.example.hospitalfrontend.model.Diagnosis
 import com.example.hospitalfrontend.model.LoginRequest
 import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.model.PatientState
@@ -22,8 +23,13 @@ interface ApiService {
     @GET("nurse")
     suspend fun getAll(): List<NurseState>
 
+
     @GET("nurse/patient")
     suspend fun getAllPatients(): List<PatientState>
+
+    @GET("/nurse/diagnosis/{id}")
+    suspend fun getDiagnosis(@Path("id") id: Int): Diagnosis
+
 
     @POST("nurse/login")
     suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState

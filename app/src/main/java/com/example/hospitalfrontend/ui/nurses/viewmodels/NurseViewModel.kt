@@ -1,17 +1,31 @@
 package com.example.hospitalfrontend.ui.nurses.viewmodels
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hospitalfrontend.model.Diagnosis
 import com.example.hospitalfrontend.model.LoginState
 import com.example.hospitalfrontend.model.NurseState
 import com.example.hospitalfrontend.model.PatientState
+import com.example.hospitalfrontend.network.ApiService
+import com.example.hospitalfrontend.network.RemoteViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class NurseViewModel : ViewModel() {
+    private val apiService: ApiService = Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:8080/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(ApiService::class.java)
     // Login variables
     private val _loginState = MutableStateFlow(LoginState())
     val loginState: StateFlow<LoginState> get() = _loginState.asStateFlow()
@@ -35,6 +49,14 @@ class NurseViewModel : ViewModel() {
     // Variable for search nurse
     private val _currentSearchName = MutableStateFlow("")
     val currentSearchName: StateFlow<String> get() = _currentSearchName.asStateFlow()
+
+    private val _diagnosisState = mutableStateOf<Diagnosis?>(null)
+    val diagnosisState: Diagnosis?
+        get() = _diagnosisState.value
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: String?
+        get() = _errorMessage.value
 
     init {
         loadSpeciality()
@@ -110,5 +132,17 @@ class NurseViewModel : ViewModel() {
 
     fun deleteNurse() {
         disconnectNurse()
+    }
+
+    fun loadDiagnosis(id: Int) {
+        viewModelScope.launch {
+            try {
+                val result = apiService.getDiagnosis(id)
+                _diagnosisState.value = result
+                Log.d("Diagnosis", "Fetched: $result")
+            } catch (e: Exception) {
+                Log.e("Diagnosis", "Failed to fetch diagnosis", e)
+            }
+        }
     }
 }

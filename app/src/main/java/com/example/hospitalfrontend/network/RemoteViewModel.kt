@@ -60,6 +60,8 @@ class RemoteViewModel : ViewModel() {
         }
     }
 
+    
+
     // Function to get all nurses
     fun getAllNurses() {
         viewModelScope.launch {
