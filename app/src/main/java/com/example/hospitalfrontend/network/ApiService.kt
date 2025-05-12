@@ -3,6 +3,7 @@ package com.example.hospitalfrontend.network
 import com.example.hospitalfrontend.model.Diagnosis
 import com.example.hospitalfrontend.model.LoginRequest
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.model.Room
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -42,6 +43,9 @@ interface ApiService {
 
     @GET("nurse/photo/{id}")
     suspend fun getPhotoById(@Path("id") id: Int): Response<ResponseBody>
+
+    @GET("nurse/allRoom")
+    suspend fun getAllRooms(): List<Room>
 
     @Multipart
     @POST("nurse/photo/{id}")

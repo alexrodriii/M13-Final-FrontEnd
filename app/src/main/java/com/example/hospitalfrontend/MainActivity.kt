@@ -60,8 +60,8 @@ fun MyAppHomePage(
 
     // Observe the login state as a StateFlow
     val loginState by nurseViewModel.loginState.collectAsState()
-
     // Determines the initial screen according to the authentication status
+
     val startDestination = if (loginState.isLogin) "home" else "login"
 
     LaunchedEffect(loginState.isLogin) {
@@ -95,6 +95,15 @@ fun MyAppHomePage(
         composable("diagnosis") {
             DiagnosisScreen(viewModel = nurseViewModel)
         }
+        composable("room") {
+                       RoomScreen(remoteViewModel = remoteViewModel, navController = navController)
+        }
+        composable("roomDetail/{roomId}") { backStackEntry ->
+            val roomId = backStackEntry.arguments?.getString("roomId")
+            RoomDetailScreen(remoteViewModel = remoteViewModel,navController = navController, roomId = roomId)
+        }
+
+
         composable("list") {
             //Variable for the error
             val isError = remember { mutableStateOf(false) }
@@ -147,7 +156,7 @@ fun MyAppHomePage(
 fun HomeScreen(
     navController: NavController,
 ) {
-    val options = listOf("Find", "List", "Profile", "diagnosis") // Show Find and List when logged in
+    val options = listOf("Find", "List", "Profile", "diagnosis","Room") // Show Find and List when logged in
 
     Column(
         modifier = Modifier.fillMaxSize(),

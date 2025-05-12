@@ -1,5 +1,6 @@
 package com.example.hospitalfrontend.network
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.graphics.*
 import android.util.Log
@@ -23,6 +24,7 @@ class RemoteViewModel : ViewModel() {
         mutableStateOf<RemoteApiMessageBoolean>(RemoteApiMessageBoolean.Loading)
     var remoteApiMessageUploadPhoto =
         mutableStateOf<RemoteApiMessageBoolean>(RemoteApiMessageBoolean.Loading)
+    var rooms = mutableStateListOf<Room>()
 
     // Save in a list the image and the id of the nurse
     private var listNurseImage = mutableStateListOf<NurseProfileImageState>()
@@ -199,5 +201,18 @@ class RemoteViewModel : ViewModel() {
     // Function to get cached photo
     fun getCachedPhoto(nurseId: Int): Bitmap? {
         return listNurseImage.find { it.nurseId == nurseId }?.image
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    fun getAllRooms() {
+        viewModelScope.launch {
+            try {
+                val response = apiService.getAllRooms()
+                                rooms.clear()
+                                rooms.addAll(response)
+                } catch (e: Exception) {
+
+                }
+        }
     }
 }

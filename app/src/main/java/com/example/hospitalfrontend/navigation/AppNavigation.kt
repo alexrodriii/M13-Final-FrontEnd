@@ -2,6 +2,7 @@ package com.example.hospitalfrontend.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import com.example.hospitalfrontend.ui.nurses.view.RoomDetailScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,6 +33,10 @@ fun AppNavigation(
         }
         composable(AppScreen.LoginOrRegisterScreen.route) {
             LoginOrRegisterScreen(navController, nurseViewModel, remoteViewModel)
+        }
+        composable("roomDetail/{roomId}") { backStackEntry ->
+            val roomId = backStackEntry.arguments?.getString("roomId")
+            RoomDetailScreen(navController = navController, roomId = roomId)
         }
 
     }
