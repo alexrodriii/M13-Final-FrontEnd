@@ -10,12 +10,16 @@ import okhttp3.MultipartBody
 import android.content.Context
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hospitalfrontend.model.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RemoteViewModel : ViewModel() {
+    private val _remoteApiMessageListPatient = MutableLiveData<RemoteApiMessageListPatient>()
+    val remoteApiMessageListPatient: LiveData<RemoteApiMessageListPatient> = _remoteApiMessageListPatient
+
     var remoteApiMessage = mutableStateOf<RemoteApiMessageNurse>(RemoteApiMessageNurse.Loading)
         private set
     var remoteApiListMessage =
@@ -82,6 +86,20 @@ class RemoteViewModel : ViewModel() {
             }
         }
     }
+
+    fun getAllPatients() {
+        viewModelScope.launch {
+            _remoteApiMessageListPatient.value = RemoteApiMessageListPatient.Loading
+            try {
+                val response = apiService.getAllPatients()
+                _remoteApiMessageListPatient.value = RemoteApiMessageListPatient.Success(response)
+            } catch (e: Exception) {
+                _remoteApiMessageListPatient.value = RemoteApiMessageListPatient.Error
+                Log.e("RemoteViewModel", "Error al obtener pacientes: ${e.message}")
+            }
+        }
+    }
+
 
     // Function to login a nurse
     fun loginNurse(nurse: LoginRequest) {
