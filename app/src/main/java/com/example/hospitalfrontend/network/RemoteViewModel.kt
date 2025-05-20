@@ -15,6 +15,7 @@ import com.example.hospitalfrontend.model.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.hospitalfrontend.network.RemoteApiMessageListPatient
 
 class RemoteViewModel : ViewModel() {
     private val _remoteApiMessageListPatient = MutableLiveData<RemoteApiMessageListPatient>()
@@ -87,18 +88,24 @@ class RemoteViewModel : ViewModel() {
         }
     }
 
-    fun getAllPatients() {
+
+    // Estado de pacientes obtenidos por habitación
+    private val _patientsByRoom = mutableStateOf<RemoteApiMessageListPatient>(RemoteApiMessageListPatient.Empty)
+    val patientsByRoom: State<RemoteApiMessageListPatient> = _patientsByRoom
+
+    // Función para obtener los pacientes de una habitación concreta
+    fun getPatientsByRoom(roomId: Int) {
         viewModelScope.launch {
-            _remoteApiMessageListPatient.value = RemoteApiMessageListPatient.Loading
+            _patientsByRoom.value = RemoteApiMessageListPatient.Loading
             try {
-                val response = apiService.getAllPatients()
-                _remoteApiMessageListPatient.value = RemoteApiMessageListPatient.Success(response)
+                val response = apiService.getPatientsByRoom(roomId.toString())
+                _patientsByRoom.value = RemoteApiMessageListPatient.Success(response)
             } catch (e: Exception) {
-                _remoteApiMessageListPatient.value = RemoteApiMessageListPatient.Error
-                Log.e("RemoteViewModel", "Error al obtener pacientes: ${e.message}")
+                _patientsByRoom.value = RemoteApiMessageListPatient.Error("Error al cargar pacientes: ${e.message}")
             }
         }
     }
+
 
 
     // Function to login a nurse
