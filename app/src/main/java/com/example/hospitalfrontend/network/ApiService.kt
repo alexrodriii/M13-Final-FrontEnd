@@ -3,6 +3,7 @@ package com.example.hospitalfrontend.network
 import com.example.hospitalfrontend.model.Diagnosis
 import com.example.hospitalfrontend.model.LoginRequest
 import com.example.hospitalfrontend.model.NurseState
+import com.example.hospitalfrontend.model.PatientState
 import com.example.hospitalfrontend.model.Room
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
@@ -25,6 +26,12 @@ interface ApiService {
 
     @GET("/nurse/diagnosis/{id}")
     suspend fun getDiagnosis(@Path("id") id: Int): Diagnosis
+
+    @GET("/nurse/patient/{id}")
+    suspend fun getPatients(@Path("id") id: Int): NurseState
+
+    @GET("nurse/room/{roomId}/patients")
+    suspend fun getPatientsByRoom(@Path("roomId") roomId: String): List<PatientState>
 
     @POST("nurse/login")
     suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState

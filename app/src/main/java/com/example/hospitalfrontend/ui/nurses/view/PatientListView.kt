@@ -1,4 +1,4 @@
-package com.example.hospitalfrontend.ui.nurses.view
+/*package com.example.hospitalfrontend.ui.nurses.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,3 +47,4 @@ fun PatientListView(remoteViewModel: RemoteViewModel) {
         }
     }
 }
+*/

@@ -1,10 +1,10 @@
 package com.example.hospitalfrontend.network
-
 import com.example.hospitalfrontend.model.PatientState
 
-sealed interface RemoteApiMessageListPatient {
-    object Loading : RemoteApiMessageListPatient
-    data class Success(val data: List<PatientState>) : RemoteApiMessageListPatient
-    object Error : RemoteApiMessageListPatient
-}
 
+sealed class RemoteApiMessageListPatient {
+    object Loading : RemoteApiMessageListPatient()
+    object Empty : RemoteApiMessageListPatient()
+    data class Success(val patients: List<PatientState>) : RemoteApiMessageListPatient()
+    data class Error(val message: String) : RemoteApiMessageListPatient()
+}
