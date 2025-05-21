@@ -44,15 +44,16 @@ class NurseViewModel : ViewModel() {
    private val _patientstate = MutableStateFlow<List<PatientState>>(emptyList())
     val patientState: StateFlow<List<PatientState>> = _patientstate
 
+    private val _diagnosisState = mutableStateOf<List<Diagnosis>>(emptyList())
+    val diagnosisState: List<Diagnosis>
+        get() = _diagnosisState.value
+
+
 
 
     // Variable for search nurse
     private val _currentSearchName = MutableStateFlow("")
     val currentSearchName: StateFlow<String> get() = _currentSearchName.asStateFlow()
-
-    private val _diagnosisState = mutableStateOf<Diagnosis?>(null)
-    val diagnosisState: Diagnosis?
-        get() = _diagnosisState.value
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: String?
@@ -134,10 +135,10 @@ class NurseViewModel : ViewModel() {
         disconnectNurse()
     }
 
-    fun loadDiagnosis(id: Int) {
+    fun loadDiagnosis(patientId: Int) {
         viewModelScope.launch {
             try {
-                val result = apiService.getDiagnosis(id)
+                val result = apiService.getDiagnosis(patientId)
                 _diagnosisState.value = result
                 Log.d("Diagnosis", "Fetched: $result")
             } catch (e: Exception) {

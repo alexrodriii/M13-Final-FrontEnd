@@ -16,10 +16,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hospitalfrontend.network.RemoteApiMessageListPatient
 import com.example.hospitalfrontend.network.RemoteViewModel
+import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
 @Composable
 fun RoomDetailScreen(
     remoteViewModel: RemoteViewModel = viewModel(),
+    nurseViewModel: NurseViewModel = viewModel(),
     navController: NavController,
     roomId: String?
 ) {
@@ -84,6 +86,13 @@ fun RoomDetailScreen(
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text("ID: ${patient.id}", fontSize = 16.sp)
                                     Text("Name: ${patient.name}", fontSize = 18.sp)
+                                }
+                                Button(
+                                    onClick = {
+                                        navController.navigate("diagnosis/${patient.id}")
+                                    }
+                                ) {
+                                    Text("View Diagnosis")
                                 }
                             }
                         }
