@@ -16,8 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.hospitalfrontend.network.RemoteApiMessageListNurse
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.login.HospitalLoginScreen
@@ -90,10 +92,15 @@ fun MyAppHomePage(
             )
         }
         composable("home") {
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, nurseViewModel = nurseViewModel)
         }
-        composable("diagnosis") {
-            DiagnosisScreen(viewModel = nurseViewModel)
+        composable("diagnosis/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")?.toIntOrNull()
+            if (patientId != null) {
+                DiagnosisScreen(viewModel = viewModel(), diagnosisId = patientId)
+            } else {
+                Text("Invalid patient ID")
+            }
         }
         composable("room") {
                        RoomScreen(remoteViewModel = remoteViewModel, navController = navController)
@@ -155,7 +162,10 @@ fun MyAppHomePage(
 @Composable
 fun HomeScreen(
     navController: NavController,
+    nurseViewModel: NurseViewModel
 ) {
+    val diagnosisState = nurseViewModel.diagnosisState
+    //val diagnosisId = diagnosisState?.id ?: null
     val options = listOf("Find", "List", "Profile", "diagnosis","Room") // Show Find and List when logged in
 
     Column(
@@ -172,10 +182,9 @@ fun HomeScreen(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 10.dp)
         )
-
         options.forEach { option ->
             ButtonMenuHome(
-                onScreenSelected = { navController.navigate(option.lowercase()) },
+                onScreenSelected = { navController.navigate(option.lowercase())},
                 textButton = option
             )
         }

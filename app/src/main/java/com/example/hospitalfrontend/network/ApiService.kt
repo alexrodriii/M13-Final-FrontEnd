@@ -24,8 +24,8 @@ interface ApiService {
     @GET("nurse")
     suspend fun getAll(): List<NurseState>
 
-    @GET("/nurse/diagnosis/{id}")
-    suspend fun getDiagnosis(@Path("id") id: Int): Diagnosis
+    @GET("/nurse/patient/{id}/diagnoses")
+    suspend fun getDiagnosis(@Path("id") id: Int): List<Diagnosis>
 
     @GET("/nurse/patient/{id}")
     suspend fun getPatients(@Path("id") id: Int): NurseState

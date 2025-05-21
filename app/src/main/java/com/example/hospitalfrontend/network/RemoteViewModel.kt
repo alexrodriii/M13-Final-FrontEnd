@@ -63,7 +63,7 @@ class RemoteViewModel : ViewModel() {
         }
     }
 
-    
+
 
     // Function to get all nurses
     fun getAllNurses() {
@@ -233,11 +233,11 @@ class RemoteViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiService.getAllRooms()
-                                rooms.clear()
-                                rooms.addAll(response)
-                } catch (e: Exception) {
+                rooms.clear()
+                rooms.addAll(response)
+            } catch (e: Exception) {
 
-                }
+            }
         }
     }
 }

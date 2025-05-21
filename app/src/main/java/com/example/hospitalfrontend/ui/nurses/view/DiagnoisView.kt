@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.sp
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
 @Composable
-fun DiagnosisScreen(viewModel: NurseViewModel) {
-    LaunchedEffect(Unit) {
-        viewModel.loadDiagnosis(1)
+fun DiagnosisScreen(viewModel: NurseViewModel, diagnosisId: Int) {
+    LaunchedEffect(diagnosisId) {
+        viewModel.loadDiagnosis(diagnosisId)
     }
-    val diagnosis = viewModel.diagnosisState
+    val diagnosisList = viewModel.diagnosisState
     val error = viewModel.errorMessage
 
     Column(
@@ -29,10 +29,13 @@ fun DiagnosisScreen(viewModel: NurseViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        if (diagnosis != null) {
-            Text(text = "Diagnóstico: ${diagnosis.diagnostico}", fontSize = 20.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Motivo: ${diagnosis.motivo}", fontSize = 16.sp)
+        if (diagnosisList.isNotEmpty()) {
+            diagnosisList.forEach { diagnosis ->
+                Text(text = "Diagnóstico: ${diagnosis.diagnostico}", fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Motivo: ${diagnosis.motivo}", fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         } else if (error != null) {
             Text(text = error, fontSize = 18.sp)
         } else {
