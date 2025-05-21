@@ -7,10 +7,12 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -39,6 +41,7 @@ fun RoomDetailScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            // Close icon
             IconButton(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.align(Alignment.End)
@@ -48,14 +51,16 @@ fun RoomDetailScreen(
                     contentDescription = "Close Button"
                 )
             }
-
             Text(
-                "Room Detail",
-                style = MaterialTheme.typography.headlineLarge,
+                text = "Room Detail",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 16.dp)
             )
+
 
             when (val state = patientsState.value) {
                 is RemoteApiMessageListPatient.Loading -> {
@@ -75,24 +80,30 @@ fun RoomDetailScreen(
                     )
                 }
                 is RemoteApiMessageListPatient.Success -> {
-                    LazyColumn {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(18.dp)
+                    ) {
                         items(state.patients) { patient ->
                             Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("ID: ${patient.id}", fontSize = 16.sp)
-                                    Text("Name: ${patient.name}", fontSize = 18.sp)
-                                }
-                                Button(
-                                    onClick = {
-                                        navController.navigate("diagnosis/${patient.id}")
+                                    Text("ID: ${patient.id}", style = MaterialTheme.typography.bodySmall)
+                                    Text("Name: ${patient.name}", style = MaterialTheme.typography.titleMedium, fontStyle = FontStyle.Italic)
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    Button(
+                                        onClick = {
+                                            navController.navigate("diagnosis/${patient.id}")
+                                        },
+                                        modifier = Modifier.align(Alignment.End)
+                                    ) {
+                                        Text("View Diagnosis",  fontSize = 16.sp)
                                     }
-                                ) {
-                                    Text("View Diagnosis")
                                 }
                             }
                         }

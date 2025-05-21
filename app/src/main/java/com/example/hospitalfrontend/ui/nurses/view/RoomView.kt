@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material3.Icon
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: NavController) {
@@ -63,9 +64,13 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                 }
 
                 Text(
-                    "Rooms",
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    style = MaterialTheme.typography.headlineLarge
+                    text = "Rooms",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 16.dp)
                 )
                 LazyColumn {
                     if (rooms.isEmpty()) {
