@@ -46,5 +46,4 @@ fun PatientListView(remoteViewModel: RemoteViewModel) {
             Text("Cargando datos...")
         }
     }
-}
-*/
+}*/
