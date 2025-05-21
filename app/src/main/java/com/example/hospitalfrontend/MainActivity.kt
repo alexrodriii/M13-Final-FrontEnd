@@ -97,7 +97,11 @@ fun MyAppHomePage(
         composable("diagnosis/{patientId}") { backStackEntry ->
             val patientId = backStackEntry.arguments?.getString("patientId")?.toIntOrNull()
             if (patientId != null) {
-                DiagnosisScreen(viewModel = viewModel(), diagnosisId = patientId)
+                DiagnosisScreen(
+                    viewModel = nurseViewModel,
+                    diagnosisId = patientId,
+                    navController = navController
+                )
             } else {
                 Text("Invalid patient ID")
             }
