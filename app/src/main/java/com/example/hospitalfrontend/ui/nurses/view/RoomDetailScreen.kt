@@ -66,6 +66,7 @@ fun RoomDetailScreen(
                 is RemoteApiMessageListPatient.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is RemoteApiMessageListPatient.Error -> {
                     Text(
                         text = state.message,
@@ -73,12 +74,14 @@ fun RoomDetailScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
+
                 is RemoteApiMessageListPatient.Empty -> {
                     Text(
                         text = "No patients found.",
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
+
                 is RemoteApiMessageListPatient.Success -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -91,8 +94,31 @@ fun RoomDetailScreen(
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text("ID: ${patient.id}", style = MaterialTheme.typography.bodySmall)
-                                    Text("Name: ${patient.name}", style = MaterialTheme.typography.titleMedium, fontStyle = FontStyle.Italic)
+                                    Text(
+                                        "ID: ${patient.id}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Text(
+                                        "Name: ${patient.name}",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontStyle = FontStyle.Italic
+                                    )
+                                    Text(
+                                        "DNI: ${patient.dni}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        "Phone: ${patient.telefono}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        "Email: ${patient.correo}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        "Address: ${patient.direccion}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
 
                                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -102,7 +128,7 @@ fun RoomDetailScreen(
                                         },
                                         modifier = Modifier.align(Alignment.End)
                                     ) {
-                                        Text("View Diagnosis",  fontSize = 16.sp)
+                                        Text("View Diagnosis", fontSize = 16.sp)
                                     }
                                 }
                             }
