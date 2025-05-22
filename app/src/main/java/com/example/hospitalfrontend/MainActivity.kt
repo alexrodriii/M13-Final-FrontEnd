@@ -86,6 +86,17 @@ fun MyAppHomePage(
             val roomId = backStackEntry.arguments?.getString("roomId")
             RoomDetailScreen(remoteViewModel = remoteViewModel,navController = navController, roomId = roomId)
         }
+        composable("care/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")?.toIntOrNull()
+            if (patientId != null) {
+                CareView(
+                    patientId = patientId,
+                    navController = navController
+                )
+            } else {
+                Text("Invalid patient ID")
+            }
+        }
         composable("login") {
             HospitalLoginScreen(
                 navController = navController,

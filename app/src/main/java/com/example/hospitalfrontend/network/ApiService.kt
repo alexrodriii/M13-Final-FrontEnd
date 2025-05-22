@@ -1,5 +1,6 @@
 package com.example.hospitalfrontend.network
 
+import com.example.hospitalfrontend.model.CareState
 import com.example.hospitalfrontend.model.Diagnosis
 import com.example.hospitalfrontend.model.LoginRequest
 import com.example.hospitalfrontend.model.NurseState
@@ -33,6 +34,9 @@ interface ApiService {
     @GET("nurse/room/{roomId}/patients")
     suspend fun getPatientsByRoom(@Path("roomId") roomId: String): List<PatientState>
 
+    @GET("nurse/care/{id}")
+    suspend fun getCarebyPatient(@Path("id") patientId: Int): List<CareState>
+
     @POST("nurse/login")
     suspend fun loginNurse(@Body loginRequest: LoginRequest): NurseState
 
@@ -53,6 +57,8 @@ interface ApiService {
 
     @GET("nurse/allRoom")
     suspend fun getAllRooms(): List<Room>
+
+
 
     @Multipart
     @POST("nurse/photo/{id}")

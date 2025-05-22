@@ -12,14 +12,20 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hospitalfrontend.model.*
+import kotlinx.coroutines.delay
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import retrofit2.converter.gson.GsonConverterFactory
-import com.example.hospitalfrontend.network.RemoteApiMessageListPatient
+
+
 
 class RemoteViewModel : ViewModel() {
     private val _remoteApiMessageListPatient = MutableLiveData<RemoteApiMessageListPatient>()
     val remoteApiMessageListPatient: LiveData<RemoteApiMessageListPatient> = _remoteApiMessageListPatient
+    var caresByPatient: RemoteApiMessageListCare by mutableStateOf(RemoteApiMessageListCare.Idle)
+        private set
+    var patientsByRoom: RemoteApiMessageListPatient by mutableStateOf(RemoteApiMessageListPatient.Idle)
+        private set
 
     var remoteApiMessage = mutableStateOf<RemoteApiMessageNurse>(RemoteApiMessageNurse.Loading)
         private set
@@ -88,12 +94,9 @@ class RemoteViewModel : ViewModel() {
         }
     }
 
-
-    // Estado de pacientes obtenidos por habitación
     private val _patientsByRoom = mutableStateOf<RemoteApiMessageListPatient>(RemoteApiMessageListPatient.Empty)
-    val patientsByRoom: State<RemoteApiMessageListPatient> = _patientsByRoom
+    val patientsByRoom1: State<RemoteApiMessageListPatient> = _patientsByRoom
 
-    // Función para obtener los pacientes de una habitación concreta
     fun getPatientsByRoom(roomId: Int) {
         viewModelScope.launch {
             _patientsByRoom.value = RemoteApiMessageListPatient.Loading
@@ -226,6 +229,32 @@ class RemoteViewModel : ViewModel() {
     // Function to get cached photo
     fun getCachedPhoto(nurseId: Int): Bitmap? {
         return listNurseImage.find { it.nurseId == nurseId }?.image
+    }
+
+    fun getPatientsByRoom(roomId: String) {
+        viewModelScope.launch {
+            patientsByRoom = RemoteApiMessageListPatient.Loading
+
+            val response = apiService.getPatientsByRoom(roomId)
+
+            patientsByRoom = RemoteApiMessageListPatient.Success(
+                response
+            )
+        }
+    }
+
+    fun getCaresByPatient(patientId: Int) {
+        viewModelScope.launch {
+            caresByPatient = RemoteApiMessageListCare.Loading
+
+            val response = apiService.getCarebyPatient(patientId)
+            Log.d("careID",response.toString())
+
+            caresByPatient = RemoteApiMessageListCare.Success(
+                response
+            )
+
+        }
     }
 
     @SuppressLint("SuspiciousIndentation")

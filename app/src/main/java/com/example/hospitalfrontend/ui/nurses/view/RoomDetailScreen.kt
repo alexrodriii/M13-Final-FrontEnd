@@ -16,9 +16,11 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.hospitalfrontend.navigation.AppScreen
 import com.example.hospitalfrontend.network.RemoteApiMessageListPatient
 import com.example.hospitalfrontend.network.RemoteViewModel
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
+import com.example.hospitalfrontend.ui.nurses.view.*
 
 @Composable
 fun RoomDetailScreen(
@@ -27,7 +29,7 @@ fun RoomDetailScreen(
     navController: NavController,
     roomId: String?
 ) {
-    val patientsState = remoteViewModel.patientsByRoom
+    val patientsState = remoteViewModel.patientsByRoom1
 
     LaunchedEffect(roomId) {
         roomId?.toIntOrNull()?.let { id ->
@@ -104,11 +106,20 @@ fun RoomDetailScreen(
                                     ) {
                                         Text("View Diagnosis",  fontSize = 16.sp)
                                     }
+                                    Button(
+                                        onClick = {
+                                            navController.navigate("care/${patient.id}")
+                                        }
+                                    ) {
+                                        Text("View Care",  fontSize = 16.sp)
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                RemoteApiMessageListPatient.Idle -> TODO()
             }
         }
     }
