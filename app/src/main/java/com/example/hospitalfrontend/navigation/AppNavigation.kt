@@ -24,20 +24,7 @@ fun AppNavigation(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(AppScreen.SplashScreen.route) {
-            SplashScreen {
-                navController.navigate(AppScreen.LoginOrRegisterScreen.route) {
-                    popUpTo(AppScreen.SplashScreen.route) { inclusive = true }
-                }
-            }
-        }
-        composable(AppScreen.LoginOrRegisterScreen.route) {
-            LoginOrRegisterScreen(navController, nurseViewModel, remoteViewModel)
-        }
-        composable("roomDetail/{roomId}") { backStackEntry ->
-            val roomId = backStackEntry.arguments?.getString("roomId")
-            RoomDetailScreen(navController = navController, roomId = roomId)
-        }
+
 
 
     }
