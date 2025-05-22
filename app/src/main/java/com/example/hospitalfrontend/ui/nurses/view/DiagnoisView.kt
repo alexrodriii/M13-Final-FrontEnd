@@ -101,7 +101,6 @@ fun DiagnosisScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiagnosisCard(diagnosis: Diagnosis) {
     Card(
@@ -110,28 +109,23 @@ fun DiagnosisCard(diagnosis: Diagnosis) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Diagnóstico:",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = diagnosis.diagnostico,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(bottom = 24.dp) // Más separación
-            )
+            Text("Diagnóstico:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text(diagnosis.diagnostico, fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
 
-            Text(
-                text = "Motivo:",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = diagnosis.motivo,
-                fontSize = 14.sp
-            )
+            Text("Motivo:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text(diagnosis.motivo, fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
+
+            Text("Portador de O2:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text(diagnosis.portadorO2Tipus ?: "N/A", fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
+
+            Text("Portador de Bolquer:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text(if (diagnosis.portadorBolquer == true) "Sí" else "No", fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
+
+            Text("Número de Canvis de Bolquer:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text(diagnosis.numeroCanvisBolquer?.toString() ?: "0", fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
+
+            Text("Estat de la Pell:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text(diagnosis.estatPell ?: "No disponible", fontSize = 14.sp)
         }
     }
 }
