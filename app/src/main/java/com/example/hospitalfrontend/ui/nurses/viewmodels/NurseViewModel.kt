@@ -22,7 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class NurseViewModel : ViewModel() {
     private val apiService: ApiService = Retrofit.Builder()
-        .baseUrl("http://10.118.3.45:8080/")
+        .baseUrl("http://10.0.2.2:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(ApiService::class.java)
