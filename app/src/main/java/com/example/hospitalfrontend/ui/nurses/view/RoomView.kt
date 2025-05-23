@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
+import com.example.hospitalfrontend.model.PatientState
 
 @Composable
 fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: NavController) {
@@ -102,6 +103,23 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                                         fontSize = 16.sp,
                                         modifier = Modifier.padding(top = 4.dp)
                                     )
+                                    // Mostrar todos los pacientes asociados a esta habitación
+                                    if (room.patients.isNotEmpty()) {
+                                        room.patients.forEach { patient ->
+                                            Text(
+                                                text = "Patient: ${patient.name}",
+                                                fontSize = 16.sp,
+                                                modifier = Modifier.padding(top = 4.dp)
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            text = "No patients in this room",
+                                            fontSize = 14.sp,
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
+                                    }
+                                }
                                 }
                             }
                         }
@@ -110,4 +128,4 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
             }
         }
     }
-}
+
