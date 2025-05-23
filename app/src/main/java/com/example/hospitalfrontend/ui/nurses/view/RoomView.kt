@@ -38,7 +38,9 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
     LaunchedEffect(Unit) {
         remoteViewModel.getAllRooms()
     }
+
     val rooms = remoteViewModel.rooms
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -48,7 +50,6 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 20.dp)
-                    .size(24.dp)
             ) {
                 IconButton(
                     onClick = { navController.popBackStack() },
@@ -69,23 +70,39 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                         .align(Alignment.CenterHorizontally)
                         .padding(bottom = 16.dp)
                 )
+
                 LazyColumn {
                     if (rooms.isEmpty()) {
                         item {
-                            CircularProgressIndicator()
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
                         }
                     } else {
                         items(rooms) { room ->
                             Button(
                                 onClick = {
-                                    navController.navigate("roomDetail/${room.id}") {
-                                    Log.d("RoomScreen", "NavController: $navController")
-                                        println("Room clicked: ${room.observations} (ID: ${room.id})")
-                                    }
+                                    navController.navigate("roomDetail/${room.id}")
+                                    Log.d("RoomScreen", "Room clicked: ${room.id}")
                                 },
-                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
                             ) {
-                                Text(text = room.observations, fontSize = 20.sp)
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "Room: ${room.id}",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Observations: ${room.observations}",
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
                             }
                         }
                     }
