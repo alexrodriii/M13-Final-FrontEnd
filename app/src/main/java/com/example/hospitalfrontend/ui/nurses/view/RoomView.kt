@@ -1,38 +1,23 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
 import android.util.Log
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Surface
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.hospitalfrontend.network.RemoteViewModel
-import kotlinx.coroutines.launch
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Hotel
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.Icon
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
-import com.example.hospitalfrontend.model.PatientState
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.hospitalfrontend.network.RemoteViewModel
 
 @Composable
 fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: NavController) {
@@ -42,84 +27,111 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
 
     val rooms = remoteViewModel.rooms
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 20.dp)
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.End)
             ) {
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Close Button"
-                    )
-                }
-
-                Text(
-                    text = "Rooms",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 16.dp)
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Close Button"
                 )
+            }
 
-                LazyColumn {
-                    if (rooms.isEmpty()) {
-                        item {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator()
-                            }
-                        }
-                    } else {
-                        items(rooms) { room ->
-                            Button(
-                                onClick = {
-                                    navController.navigate("roomDetail/${room.id}")
-                                    Log.d("RoomScreen", "Room clicked: ${room.id}")
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth()
+            Text(
+                text = "Rooms",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp)
+            )
+
+            if (rooms.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(rooms) { room ->
+                        Card(
+                            onClick = {
+                                navController.navigate("roomDetail/${room.id}")
+                                Log.d("RoomScreen", "Room clicked: ${room.id}")
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+
+                                // Icono de hotel junto al texto de la habitación
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Hotel,
+                                        contentDescription = "Room Icon",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = "Room: ${room.id}",
                                         fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
-                                    Text(
-                                        text = "Observations: ${room.observations}",
-                                        fontSize = 16.sp,
-                                        modifier = Modifier.padding(top = 4.dp)
-                                    )
-                                    // Mostrar todos los pacientes asociados a esta habitación
-                                    if (room.patients.isNotEmpty()) {
-                                        room.patients.forEach { patient ->
-                                            Text(
-                                                text = "Patient: ${patient.name}",
-                                                fontSize = 16.sp,
-                                                modifier = Modifier.padding(top = 4.dp)
-                                            )
-                                        }
-                                    } else {
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "Observations:",
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    text = room.observations ?: "No observations",
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+
+                                Text(
+                                    text = "Patients:",
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                if (room.patients.isNotEmpty()) {
+                                    room.patients.forEach { patient ->
                                         Text(
-                                            text = "No patients in this room",
-                                            fontSize = 14.sp,
-                                            modifier = Modifier.padding(top = 4.dp)
+                                            text = "- ${patient.name}",
+                                            fontSize = 16.sp,
+                                            modifier = Modifier.padding(
+                                                start = 8.dp,
+                                                top = 2.dp
+                                            )
                                         )
                                     }
-                                }
+                                } else {
+                                    Text(
+                                        text = "No patients in this room",
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.padding(
+                                            start = 8.dp,
+                                            top = 4.dp
+                                        ),
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
                                 }
                             }
                         }
@@ -128,4 +140,4 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
             }
         }
     }
-
+}
