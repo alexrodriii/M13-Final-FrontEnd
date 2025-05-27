@@ -39,12 +39,12 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = "Close Button"
+                    contentDescription = "Botó Tancar"
                 )
             }
 
             Text(
-                text = "Rooms",
+                text = "Habitacions",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -82,13 +82,13 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Hotel,
-                                        contentDescription = "Room Icon",
+                                        contentDescription = "Icona Habitació",
                                         tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "Room: ${room.id}",
+                                        text = "Habitació: ${room.id}",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
@@ -98,7 +98,7 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 Text(
-                                    text = "Observations:",
+                                    text = "Observacions:",
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
@@ -108,7 +108,7 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                                 )
 
                                 Text(
-                                    text = "Patients:",
+                                    text = "Pacients:",
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 if (room.patients.isNotEmpty()) {
@@ -124,7 +124,7 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                                     }
                                 } else {
                                     Text(
-                                        text = "No patients in this room",
+                                        text = "No hi ha pacients en aquesta habitació",
                                         fontSize = 14.sp,
                                         modifier = Modifier.padding(
                                             start = 8.dp,

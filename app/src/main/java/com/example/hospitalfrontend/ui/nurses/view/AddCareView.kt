@@ -68,7 +68,7 @@ fun AddCareView(
     LaunchedEffect(createCareState) {
         when (createCareState) {
             is RemoteApiMessageCare.Success -> {
-                dialogMessage = "Care created successfully!"
+                dialogMessage = "Care creada amb èxit!"
                 showSuccessDialog = true
                 remoteViewModel.clearApiMessage()
                 patientId?.let { pId ->
@@ -84,12 +84,12 @@ fun AddCareView(
                 }
             }
             is RemoteApiMessageCare.Error -> {
-                dialogMessage = "Error creating care: ${createCareState.errorMessage}"
+                dialogMessage = "Error creant el care: ${createCareState.errorMessage}"
                 showErrorDialog = true
                 remoteViewModel.clearApiMessage() // Limpiar el estado
             }
             RemoteApiMessageCare.Loading -> {
-                Log.d("CareAddView", "Loading...")
+                Log.d("CareAddView", "Carregant...")
             }
             RemoteApiMessageCare.Idle -> {
                 // Estado inicial o después de limpiar
@@ -100,10 +100,10 @@ fun AddCareView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Care for Patient ID: ${patientId ?: "N/A"}") },
+                title = { Text("Afegir un nou Care pel pacient anb ID: ${patientId ?: "N/A"}") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Enrere")
                     }
                 }
             )
@@ -118,7 +118,7 @@ fun AddCareView(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "New Care Record",
+                text = "Nou registre de Care",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -127,7 +127,7 @@ fun AddCareView(
 
             CareInputField(
                 valueState = taSistolica,
-                labelId = "Tensión Arterial Sistólica",
+                labelId = "Tensió Arterial Sistòlica",
                 icon = Icons.Default.HealthAndSafety,
                 keyboardType = KeyboardType.Number
             )
@@ -135,7 +135,7 @@ fun AddCareView(
 
             CareInputField(
                 valueState = freqResp,
-                labelId = "Frecuencia Respiratoria",
+                labelId = "Freqüència Respiratòria",
                 icon = Icons.Default.MonitorHeart,
                 keyboardType = KeyboardType.Number
             )
@@ -143,7 +143,7 @@ fun AddCareView(
 
             CareInputField(
                 valueState = pols,
-                labelId = "Pulsaciones",
+                labelId = "Pulsacions",
                 icon = Icons.Default.MonitorHeart,
                 keyboardType = KeyboardType.Number
             )
@@ -169,7 +169,7 @@ fun AddCareView(
                         )
                         remoteViewModel.createCare(patientId, newCare)
                     } else {
-                        dialogMessage = "Patient ID is missing."
+                        dialogMessage = "Falta de ID de pacient."
                         showErrorDialog = true
                     }
                 },
@@ -191,7 +191,7 @@ fun AddCareView(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Add Care",
+                        text = "Afegir Care",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -209,7 +209,7 @@ fun AddCareView(
                     Text("OK")
                 }
             },
-            title = { Text(text = "Success") },
+            title = { Text(text = "Èxit") },
             text = { Text(text = dialogMessage) }
         )
     }
@@ -266,7 +266,7 @@ fun CareInputField(
     )
     if (valueState.value.isEmpty() || valueState.value.toIntOrNull() == null) {
         Text(
-            text = "Enter a valid number",
+            text = "Introduïu un número vàlid",
             color = Color.Red,
             fontSize = 12.sp,
         )

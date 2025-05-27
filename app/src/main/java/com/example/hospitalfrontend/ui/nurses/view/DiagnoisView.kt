@@ -36,14 +36,14 @@ fun DiagnosisScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Diagnóstico del paciente",
+                        text = "Diagnòstic del pacient",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Enrere")
                     }
                 }
             )
@@ -109,13 +109,13 @@ fun DiagnosisCard(diagnosis: Diagnosis) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Diagnóstico:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text("Diagnòstic:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
             Text(diagnosis.diagnostico, fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
 
-            Text("Motivo:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text("Motiu:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
             Text(diagnosis.motivo, fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
 
-            Text("Portador de O2:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
+            Text("Portador d'O2:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)
             Text(diagnosis.portadorO2Tipus ?: "N/A", fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp))
 
             Text("Portador de Bolquer:", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)

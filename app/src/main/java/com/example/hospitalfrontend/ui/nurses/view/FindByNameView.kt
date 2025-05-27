@@ -94,7 +94,7 @@ fun ListSearchNurse(nurse: NurseState, remoteViewModel: RemoteViewModel) {
         ) {
             Image(
                 painter = imageToShow,
-                contentDescription = "Profile Picture",
+                contentDescription = "Imatge de Perfil",
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape),
@@ -107,12 +107,12 @@ fun ListSearchNurse(nurse: NurseState, remoteViewModel: RemoteViewModel) {
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
-                Text(text = "ID Nurse: ${nurse.id}")
-                Text(text = "Name: ${nurse.name}")
-                Text(text = "Surname: ${nurse.surname}")
-                Text(text = "Date Bird: ${nurse.age} ($age years old)")
+                Text(text = "ID de Infermera: ${nurse.id}")
+                Text(text = "Nom: ${nurse.name}")
+                Text(text = "Cognom: ${nurse.surname}")
+                Text(text = "Edat: ${nurse.age} ($age anys)")
                 Text(text = "Email: ${nurse.email}")
-                Text(text = "Speciality: ${nurse.speciality}")
+                Text(text = "Especialitat: ${nurse.speciality}")
             }
         }
     }
@@ -139,13 +139,13 @@ fun FindScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = "Close Button",
+                    contentDescription = "Botó Tancar",
                     tint = colorResource(id = R.color.colorText)
                 )
             }
 
             Text(
-                "Find Nurse",
+                "Troba una infermera",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.headlineLarge
             )
