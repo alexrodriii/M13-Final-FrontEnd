@@ -6,6 +6,7 @@ data class PatientState(
     val dni : Int,
     val telefono: Int,
     val direccion : String,
-    val correo : String
+    val correo : String,
+    val historyNumber: Int?
 
 )

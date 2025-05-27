@@ -118,6 +118,10 @@ fun RoomDetailScreen(
                                         "Adreça: ${patient.direccion}",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
+                                    Text(
+                                        "Numero historial: ${patient.historyNumber}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
 
                                     Spacer(modifier = Modifier.height(12.dp))
 
