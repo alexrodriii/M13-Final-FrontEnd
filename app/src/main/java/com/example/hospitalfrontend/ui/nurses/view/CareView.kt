@@ -2,6 +2,8 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
 import android.util.Log
+import java.text.SimpleDateFormat
+import java.util.Locale
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +24,7 @@ import com.example.hospitalfrontend.network.RemoteApiMessageListCare // Importar
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontStyle
 import com.example.hospitalfrontend.navigation.AppScreen
+import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,9 +112,35 @@ fun CareView(
 
                                     ) {
                                         Column(modifier = Modifier.padding(16.dp)) {
-                                            Text("ID de Care: ${care.id ?: "N/A"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                          Text("Temperatura: ${care.temperatura}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                            care.date?.let { date ->
+                                                val dateFormatter = SimpleDateFormat("dd/MM/yyyy HH:mm")
+                                                dateFormatter.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 
+                                                Text(
+                                                    text = "Date: ${dateFormatter.format(date)}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                                                    fontStyle = FontStyle.Italic
+                                                )
+                                            }
+                                            care.nurse?.let { nurse ->
+                                                val nurseFullName = if (nurse.surname.isNullOrBlank()) {
+                                                    nurse.name
+                                                } else {
+                                                    "${nurse.name} ${nurse.surname}"
+                                                }
+                                                Text(
+                                                    text = "Infermera: ${nurse.name} ${nurse.surname ?: ""}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                                                    fontStyle = FontStyle.Italic
+                                                )
+                                            } ?: Text(
+                                                text = "Infermera no ha sigut trobada",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                                                fontStyle = FontStyle.Italic
+                                            )
                                         }
                                     }
                                 }
