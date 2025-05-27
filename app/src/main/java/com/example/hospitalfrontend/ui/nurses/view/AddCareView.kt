@@ -131,6 +131,7 @@ fun AddCareView(
                 valueState = taSistolica,
                 labelId = "Tensió Arterial Sistòlica",
                 icon = Icons.Default.HealthAndSafety,
+                placeholderText = "Tensió Arterial (140/90mmHg, 90/50mmHg)",
                 keyboardType = KeyboardType.Number
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -138,6 +139,7 @@ fun AddCareView(
             CareInputField(
                 valueState = freqResp,
                 labelId = "Freqüència Respiratòria",
+                placeholderText = "Freqüència Respiratòria (12x’- 20x’)",
                 icon = Icons.Default.MonitorHeart,
                 keyboardType = KeyboardType.Number
             )
@@ -147,6 +149,7 @@ fun AddCareView(
                 valueState = pols,
                 labelId = "Pulsacions",
                 icon = Icons.Default.MonitorHeart,
+                placeholderText = "Pulsaciones (50x’-100x’)",
                 keyboardType = KeyboardType.Number
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -154,6 +157,7 @@ fun AddCareView(
             CareInputField(
                 valueState = temperatura,
                 labelId = "Temperatura",
+                placeholderText = "Temperatura(34’9ºC- 38’5ºC)",
                 icon = Icons.Default.Thermostat,
                 keyboardType = KeyboardType.Number
             )
@@ -236,6 +240,7 @@ fun CareInputField(
     valueState: MutableState<String>,
     labelId: String,
     icon: ImageVector,
+    placeholderText: String,
     keyboardType: KeyboardType,
     isSingleLine: Boolean = true
 ) {
@@ -249,6 +254,7 @@ fun CareInputField(
             }
         },
         label = { Text(text = labelId) },
+        placeholder = { Text(text = placeholderText) },
         singleLine = isSingleLine,
         leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
         modifier = Modifier
