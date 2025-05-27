@@ -106,9 +106,11 @@ fun MyAppHomePage(
 
             if (patientId != null && roomId != null) {
                 AddCareView(
-                    patientId = patientId,
                     navController = navController,
-                    roomId = roomId
+                    patientId = patientId,
+                    roomId = roomId,
+                    remoteViewModel = remoteViewModel,
+                    nurseViewModel = nurseViewModel
                 )
             } else {
                 Text("Invalid patient ID")

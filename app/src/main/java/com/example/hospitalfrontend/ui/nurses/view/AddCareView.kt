@@ -32,6 +32,7 @@ import com.example.hospitalfrontend.R
 import com.example.hospitalfrontend.model.CareState
 import com.example.hospitalfrontend.network.RemoteApiMessageCare
 import com.example.hospitalfrontend.network.RemoteViewModel
+import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import com.example.hospitalfrontend.ui.theme.HospitalFrontEndTheme
 import com.example.hospitalfrontend.ui.theme.Primary
 import com.example.hospitalfrontend.ui.theme.Secundary
@@ -42,7 +43,9 @@ fun AddCareView(
     navController: NavController,
     patientId: Int?,
     roomId: String?,
-    remoteViewModel: RemoteViewModel = viewModel()
+    remoteViewModel: RemoteViewModel,
+    nurseViewModel: NurseViewModel = viewModel()
+
 ) {
     val taSistolica = rememberSaveable { mutableStateOf("") }
     val freqResp = rememberSaveable { mutableStateOf("") }
@@ -72,11 +75,11 @@ fun AddCareView(
                 showSuccessDialog = true
                 remoteViewModel.clearApiMessage()
                 patientId?.let { pId ->
-                    roomId?.let { rId -> // Asegurarse de que roomId no es nulo
+                    roomId?.let { rId ->
                         navController.navigate("care/${pId}/${rId}") {
-                            popUpTo("careAdd/${pId}/${rId}") { inclusive = true } // Elimina CareAddScreen de la pila
+                            popUpTo("careAdd/${pId}/${rId}") { inclusive = true }
                         }
-                    } ?: run { // Si roomId es nulo, navega sin él (comportamiento de fallback)
+                    } ?: run {
                         navController.navigate("care/$pId") {
                             popUpTo("careAdd/{patientId}") { inclusive = true }
                         }
@@ -92,7 +95,6 @@ fun AddCareView(
                 Log.d("CareAddView", "Carregant...")
             }
             RemoteApiMessageCare.Idle -> {
-                // Estado inicial o después de limpiar
             }
         }
     }
@@ -165,9 +167,10 @@ fun AddCareView(
                             ta_sistolica = taSistolica.value.toIntOrNull(),
                             freq_resp = freqResp.value.toIntOrNull(),
                             pols = pols.value.toIntOrNull(),
-                            temperatura = temperatura.value.toIntOrNull()
+                            temperatura = temperatura.value.toIntOrNull(),
+                            date = null
                         )
-                        remoteViewModel.createCare(patientId, newCare)
+                        remoteViewModel.createCare(patientId, newCare, nurseViewModel )
                     } else {
                         dialogMessage = "Falta de ID de pacient."
                         showErrorDialog = true

@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hospitalfrontend.model.*
+import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 import kotlinx.coroutines.delay
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -261,20 +262,23 @@ class RemoteViewModel : ViewModel() {
 
         }
     }
-    fun createCare(patientId: Int, care: CareState) {
+    fun createCare(patientId: Int, care: CareState, nurseViewModel: NurseViewModel) {
         viewModelScope.launch {
             createCareState = RemoteApiMessageCare.Loading
-
             try {
-                val response = apiService.createCare(patientId,care)
-            Log.d("CareInfo:",response.toString())
-                createCareState = RemoteApiMessageCare.Success(response)
+                val loggedInNurseId = nurseViewModel.getNurseState()?.id
+                if (loggedInNurseId != null) {
+                    val response = apiService.createCare(patientId, loggedInNurseId, care)
+                    createCareState = RemoteApiMessageCare.Success(response)
+                } else {
+                    createCareState = RemoteApiMessageCare.Error("ID d'infermera no està disponible per crear cares.")
+                }
             } catch (e: Exception) {
-                createCareState = RemoteApiMessageCare.Error("Error creating care: ${e.message}")
+                createCareState = RemoteApiMessageCare.Error("Error creant care: ${e.message}")
             }
         }
-
     }
+
     fun getCareById(careId: Int) {
         viewModelScope.launch {
             careDetailState = RemoteApiMessageCare.Loading
