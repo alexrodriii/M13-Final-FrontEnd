@@ -253,12 +253,18 @@ class RemoteViewModel : ViewModel() {
         viewModelScope.launch {
             caresByPatient = RemoteApiMessageListCare.Loading
 
-            val response = apiService.getCarebyPatient(patientId)
-            Log.d("careID",response.toString())
+            try {
+                val response = apiService.getCarebyPatient(patientId)
+                Log.d("careID",response.toString())
 
-            caresByPatient = RemoteApiMessageListCare.Success(
-                response
-            )
+                val sortedCares = response.sortedByDescending { it.date }
+                caresByPatient = RemoteApiMessageListCare.Success(
+                    sortedCares
+                )
+            } catch (e: Exception) {
+                Log.e("RemoteViewModel", "Error fetching and sorting cares: ${e.message}")
+                caresByPatient = RemoteApiMessageListCare.Error("Error fetching cares: ${e.message}")
+            }
 
         }
     }
