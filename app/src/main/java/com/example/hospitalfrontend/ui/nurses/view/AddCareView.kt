@@ -102,7 +102,7 @@ fun AddCareView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Afegir un nou Care pel pacient anb ID: ${patientId ?: "N/A"}") },
+                title = { Text("Afegir un nou Care") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Enrere")
