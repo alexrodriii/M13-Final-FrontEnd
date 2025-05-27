@@ -17,8 +17,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
+sealed class DiagnosisListState {
+    object Idle : DiagnosisListState()
+    object Loading : DiagnosisListState()
+    data class Success(val diagnoses: List<Diagnosis>) : DiagnosisListState()
+    object Empty : DiagnosisListState() // Para cuando la lista está vacía
+    data class Error(val message: String) : DiagnosisListState()
+}
 
 class NurseViewModel : ViewModel() {
     private val apiService: ApiService = Retrofit.Builder()
@@ -44,9 +53,8 @@ class NurseViewModel : ViewModel() {
    private val _patientstate = MutableStateFlow<List<PatientState>>(emptyList())
     val patientState: StateFlow<List<PatientState>> = _patientstate
 
-    private val _diagnosisState = mutableStateOf<List<Diagnosis>>(emptyList())
-    val diagnosisState: List<Diagnosis>
-        get() = _diagnosisState.value
+    private val _diagnosisListState = MutableStateFlow<DiagnosisListState>(DiagnosisListState.Idle)
+    val diagnosisListState: StateFlow<DiagnosisListState> get() = _diagnosisListState.asStateFlow()
 
 
 
@@ -137,12 +145,23 @@ class NurseViewModel : ViewModel() {
 
     fun loadDiagnosis(patientId: Int) {
         viewModelScope.launch {
+            _diagnosisListState.value = DiagnosisListState.Loading // Estado de carga
             try {
-                val result = apiService.getDiagnosis(patientId)
-                _diagnosisState.value = result
+                val result = apiService.getDiagnosis(patientId) // Esta API debería devolver una lista vacía si no hay diagnósticos
+                if (result.isEmpty()) {
+                    _diagnosisListState.value = DiagnosisListState.Empty // Si la lista está vacía
+                } else {
+                    _diagnosisListState.value = DiagnosisListState.Success(result) // Éxito con datos
+                }
                 Log.d("Diagnosis", "Fetched: $result")
+            } catch (e: HttpException) {
+                val errorMessage = "HTTP Error: ${e.code()} - ${e.message()}"
+                Log.e("Diagnosis", errorMessage, e)
+                _diagnosisListState.value = DiagnosisListState.Error(errorMessage)
             } catch (e: Exception) {
-                Log.e("Diagnosis", "Failed to fetch diagnosis", e)
+                val errorMessage = "Failed to fetch diagnosis: ${e.message}"
+                Log.e("Diagnosis", errorMessage, e)
+                _diagnosisListState.value = DiagnosisListState.Error(errorMessage)
             }
         }
     }

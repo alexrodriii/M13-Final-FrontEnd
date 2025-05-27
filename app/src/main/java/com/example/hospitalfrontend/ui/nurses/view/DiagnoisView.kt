@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -15,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.hospitalfrontend.model.Diagnosis
+import com.example.hospitalfrontend.ui.nurses.viewmodels.DiagnosisListState
 import com.example.hospitalfrontend.ui.nurses.viewmodels.NurseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,12 +27,12 @@ fun DiagnosisScreen(
     diagnosisId: Int,
     navController: NavController
 ) {
+    val diagnosisListState by viewModel.diagnosisListState.collectAsState()
+
     LaunchedEffect(diagnosisId) {
         viewModel.loadDiagnosis(diagnosisId)
     }
 
-    val diagnosisList = viewModel.diagnosisState
-    val error = viewModel.errorMessage
 
     Scaffold(
         topBar = {
@@ -54,21 +57,49 @@ fun DiagnosisScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when {
-                diagnosisList.isNotEmpty() -> {
+            when (diagnosisListState) {
+                is DiagnosisListState.Loading -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                        Text("Carregant diagnostics...", modifier = Modifier.padding(top = 8.dp))
+                    }
+                }
+                is DiagnosisListState.Success -> {
+                    val diagnoses = (diagnosisListState as DiagnosisListState.Success).diagnoses
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(diagnosisList) { diagnosis ->
+                        items(diagnoses) { diagnosis ->
                             DiagnosisCard(diagnosis)
                         }
                     }
                 }
-
-                error != null -> {
+                is DiagnosisListState.Empty -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "No s'han trobat els diagnostics d'aquest pacient.",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                        Button(onClick = { viewModel.loadDiagnosis(diagnosisId) }) {
+                            Text("Reintentar")
+                        }
+                    }
+                }
+                is DiagnosisListState.Error -> {
+                    val errorMessage = (diagnosisListState as DiagnosisListState.Error).message
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -77,24 +108,17 @@ fun DiagnosisScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = error,
+                            text = "Error al carregar els diagnostics: $errorMessage",
                             fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(bottom = 12.dp)
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
                         Button(onClick = { viewModel.loadDiagnosis(diagnosisId) }) {
                             Text("Reintentar")
                         }
                     }
                 }
-
-                else -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                DiagnosisListState.Idle -> {
                 }
             }
         }
