@@ -44,7 +44,7 @@ fun CareDetailView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalls de Care amb ID: ${careId ?: "N/A"}") },
+                title = { Text("Detalls de Care") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Enrere")
@@ -92,12 +92,7 @@ fun CareDetailView(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary // Usar color primario
                                 )
-                                Text(
-                                    "ID: ${care.id ?: "N/A"}",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                )
+
                             }
                             Divider(modifier = Modifier.padding(vertical = 12.dp)) // Separador
 

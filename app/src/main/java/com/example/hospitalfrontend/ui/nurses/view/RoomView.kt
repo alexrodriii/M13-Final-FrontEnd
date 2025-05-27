@@ -76,7 +76,6 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
 
-                                // Icono de hotel junto al texto de la habitación
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -88,7 +87,7 @@ fun RoomScreen(remoteViewModel: RemoteViewModel = viewModel(), navController: Na
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "Habitació: ${room.id}",
+                                        text = "Habitació: ${room.number}",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary

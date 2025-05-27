@@ -42,7 +42,7 @@ fun CareView(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Detalls de Care del pacient amb ID: ${patientId ?: "N/A"}") },
+                    title = { Text("Detalls de Care del pacient") },
                     navigationIcon = {
                         IconButton(onClick = {
 
@@ -99,7 +99,7 @@ fun CareView(
                             ) {
                                 items(cares) { care ->
                                     Card(
-                                        modifier = Modifier.fillMaxWidth().clickable { // Añadir el modificador clickable
+                                        modifier = Modifier.fillMaxWidth().clickable {
                                             care.id?.let {
                                                 navController.navigate("careDetail/${care.id}")
                                             }
@@ -109,8 +109,8 @@ fun CareView(
 
                                     ) {
                                         Column(modifier = Modifier.padding(16.dp)) {
-                                            Text("ID de Care: ${care.id ?: "N/A"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
                                           Text("Temperatura: ${care.temperatura}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                            Text("Pols: ${care.pols}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
 
                                         }
                                     }

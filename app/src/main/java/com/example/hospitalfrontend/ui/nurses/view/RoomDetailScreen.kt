@@ -96,10 +96,7 @@ fun RoomDetailScreen(
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        "ID: ${patient.id}",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
+
                                     Text(
                                         "Nom: ${patient.name}",
                                         style = MaterialTheme.typography.titleMedium,
