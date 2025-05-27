@@ -125,13 +125,13 @@ fun ProfileScreen(
     LaunchedEffect(remoteApiMessageUploadPhoto) {
         when (remoteApiMessageUploadPhoto) {
             is RemoteApiMessageBoolean.Success -> {
-                dialogMessage = "Photo uploaded successfully."
+                dialogMessage = "La foto s'ha penjat correctament."
                 showSuccessDialog = true
                 remoteViewModel.clearApiMessage()
             }
 
             is RemoteApiMessageBoolean.Error -> {
-                dialogMessage = "Failing to upload photo."
+                dialogMessage = "No s'ha pogut carregar la foto."
                 showErrorDialog = true
                 remoteViewModel.clearApiMessage()
             }
@@ -241,12 +241,12 @@ fun ProfileHeader(
         IconButton(onClick = { navController.popBackStack() }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = "Enrere",
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
         }
-        Text(text = "Profile", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Perfil", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         IconButton(enabled = isFormValid(), onClick = {
             if (nurseState?.id != null) {
                 val updateNurse = NurseState(
@@ -264,7 +264,7 @@ fun ProfileHeader(
         ) {
             Icon(
                 imageVector = Icons.Default.Save,
-                contentDescription = "Save Change",
+                contentDescription = "Guardar Canvis",
                 tint = if (isFormValid()) Color.Green else Color.LightGray,
                 modifier = Modifier.size(30.dp)
             )
@@ -272,18 +272,18 @@ fun ProfileHeader(
         LaunchedEffect(remoteApiMessage) {
             when (remoteApiMessage) {
                 is RemoteApiMessageNurse.Success -> {
-                    dialogMessage = "Data updated successfully."
+                    dialogMessage = "Dades actualitzades correctament."
                     showSuccessDialog = true
                     remoteViewModel.clearApiMessage()
                 }
 
                 is RemoteApiMessageNurse.Error -> {
-                    dialogMessage = "Failing to update data."
+                    dialogMessage = "No s'han pogut actualitzar les dades."
                     showErrorDialog = true
                     remoteViewModel.clearApiMessage()
                 }
 
-                RemoteApiMessageNurse.Loading -> Log.d("Loading Update", "Loading")
+                RemoteApiMessageNurse.Loading -> Log.d("Carregant l'actualització", "Carregant")
             }
         }
         SuccessDialog(

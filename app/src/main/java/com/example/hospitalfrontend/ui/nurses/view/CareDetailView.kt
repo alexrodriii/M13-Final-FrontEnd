@@ -44,10 +44,10 @@ fun CareDetailView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Care Details for ID: ${careId ?: "N/A"}") },
+                title = { Text("Detalls de Care amb ID: ${careId ?: "N/A"}") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Enrere")
                     }
                 }
             )
@@ -64,7 +64,7 @@ fun CareDetailView(
             when (val state = careDetailState) {
                 is RemoteApiMessageCare.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    Text("Loading care details...", modifier = Modifier.padding(top = 8.dp))
+                    Text("Carregant detalls de Care...", modifier = Modifier.padding(top = 8.dp))
                 }
                 is RemoteApiMessageCare.Success -> {
                     val care = state.care
@@ -87,7 +87,7 @@ fun CareDetailView(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    "Care Record",
+                                    "Registre de Care",
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary // Usar color primario
@@ -104,7 +104,7 @@ fun CareDetailView(
                             // Detalles de cuidado con iconos
                             CareDetailItem(
                                 icon = Icons.Default.Favorite,
-                                label = "Tensión Arterial Sistólica:",
+                                label = "Tensió arterial sistòlica:",
                                 value = care.ta_sistolica?.toString() ?: "N/A",
                                 unit = "mmHg"
                             )
@@ -112,7 +112,7 @@ fun CareDetailView(
 
                             CareDetailItem(
                                 icon = Icons.Default.MonitorHeart,
-                                label = "Frecuencia Respiratoria:",
+                                label = "Freqüència Respiratòria:",
                                 value = care.freq_resp?.toString() ?: "N/A",
                                 unit = "bpm"
                             )
@@ -120,7 +120,7 @@ fun CareDetailView(
 
                             CareDetailItem(
                                 icon = Icons.Default.MedicalServices,
-                                label = "Pulsaciones:",
+                                label = "Pulsacions:",
                                 value = care.pols?.toString() ?: "N/A",
                                 unit = "ppm"
                             )
@@ -143,7 +143,7 @@ fun CareDetailView(
                     )
                 }
                 RemoteApiMessageCare.Idle -> {
-                    Text("Select a care to see details.", style = MaterialTheme.typography.bodyLarge)
+                    Text("Seleccioneu una Care per veure els detalls", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }

@@ -94,7 +94,7 @@ fun LoginOrRegisterScreen(
     ) {
         Image()
         Text(
-            text = "Login", modifier = Modifier
+            text = "Inici de sessió", modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(), style = TextStyle(
                 fontSize = 30.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Normal
@@ -124,7 +124,7 @@ fun ToggleLoginRegisterText(navController: NavController) {
 fun Image() {
     Image(
         painter = painterResource(id = R.drawable.login),
-        contentDescription = "Login screen image",
+        contentDescription = "Imatge de la pantalla d'inici de sessió",
         modifier = Modifier.size(100.dp)
     )
 }
@@ -178,7 +178,7 @@ fun UserForm(
         Spacer(modifier = Modifier.height(50.dp))
 
         SubmitButton(
-            textId = "Login", inputValid = isValid
+            textId = "Inicar sessió", inputValid = isValid
         ) {
             val dataLogin = LoginRequest(nurseNumber.value.toInt())
             remoteViewModel.loginNurse(dataLogin)
@@ -194,7 +194,7 @@ fun UserForm(
                     }
                 },
                 title = {
-                    Text(text = "ERROR: Login")
+                    Text(text = "ERROR: Inici de sessió")
                 },
                 text = {
                     Text(text = dialogMessage)
@@ -215,11 +215,11 @@ fun UserForm(
 
                 is RemoteApiMessageNurse.Error -> {
                     // Show dialog with a specific message
-                    dialogMessage = "Incorrect NurseNumber"
+                    dialogMessage = "Número d'infermera incorrecte"
                     showDialog = true // Show the dialog
                 }
 
-                RemoteApiMessageNurse.Loading -> Log.d("Loading", "Loading")
+                RemoteApiMessageNurse.Loading -> Log.d("Carregant", "Carregant")
             }
         }
 
@@ -259,7 +259,7 @@ fun SubmitButton(
 @Composable
 fun NurseNumberInput(
     nurseNumberState: MutableState<String>,
-    labelId: String = "Nurse Number"
+    labelId: String = "Número d'infermera"
 ) {
     InputField(
         valueState = nurseNumberState,

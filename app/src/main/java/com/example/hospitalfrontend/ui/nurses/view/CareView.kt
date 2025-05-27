@@ -42,7 +42,7 @@ fun CareView(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Care Details for Patient ID: ${patientId ?: "N/A"}") },
+                    title = { Text("Detalls de Care del pacient amb ID: ${patientId ?: "N/A"}") },
                     navigationIcon = {
                         IconButton(onClick = {
 
@@ -55,7 +55,7 @@ fun CareView(
                                 }
                             } ?: navController.popBackStack()
                         }) {
-                            Icon(Icons.Filled.ArrowBack, "Back to Room Details")
+                            Icon(Icons.Filled.ArrowBack, "Tornar als detalls de l'habitació")
                         }
                     }
                 )
@@ -66,7 +66,7 @@ fun CareView(
                         navController.navigate("careAdd/${patientId}/${roomId}")
                     }
                 }) {
-                    Icon(Icons.Filled.Add, "Add new care")
+                    Icon(Icons.Filled.Add, "Afegeix una Care nova")
                 }
             }
         ) { paddingValues ->
@@ -80,18 +80,18 @@ fun CareView(
                 when (caresState) {
                     is RemoteApiMessageListCare.Loading -> {
                         CircularProgressIndicator()
-                        Text("Loading care details...", modifier = Modifier.padding(top = 8.dp))
+                        Text("Carregant detalls de la Care", modifier = Modifier.padding(top = 8.dp))
                     }
                     is RemoteApiMessageListCare.Success -> {
                         val cares = caresState.care
                         Text(
-                            text = "List of Cares:",
+                            text = "Llista de les Cares:",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
                         if (cares.isEmpty()) {
-                            Text("No care records found for this patient.", style = MaterialTheme.typography.bodyLarge)
+                            Text("No s'han trobat registres de Cares per a aquest pacient.", style = MaterialTheme.typography.bodyLarge)
                         } else {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
@@ -109,7 +109,7 @@ fun CareView(
 
                                     ) {
                                         Column(modifier = Modifier.padding(16.dp)) {
-                                            Text("Care ID: ${care.id ?: "N/A"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                            Text("ID de Care: ${care.id ?: "N/A"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
                                           Text("Temperatura: ${care.temperatura}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
 
                                         }
@@ -122,7 +122,7 @@ fun CareView(
                         Text("Error: ${caresState.errorMessage}", color = MaterialTheme.colorScheme.error)
                     }
                     RemoteApiMessageListCare.Idle -> {
-                        Text("Waiting for care details...", style = MaterialTheme.typography.bodyLarge)
+                        Text("Esperant els detalls de Care...", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }

@@ -50,11 +50,11 @@ fun RoomDetailScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = "Close Button"
+                    contentDescription = "Butó tancar"
                 )
             }
             Text(
-                text = "Room Detail",
+                text = "Detalls de l'habitació",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -79,7 +79,7 @@ fun RoomDetailScreen(
 
                 is RemoteApiMessageListPatient.Empty -> {
                     Text(
-                        text = "No patients found.",
+                        text = "No s'han trobat pacients.",
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
@@ -101,7 +101,7 @@ fun RoomDetailScreen(
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                     Text(
-                                        "Name: ${patient.name}",
+                                        "Nom: ${patient.name}",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontStyle = FontStyle.Italic
                                     )
@@ -110,7 +110,7 @@ fun RoomDetailScreen(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Text(
-                                        "Phone: ${patient.telefono}",
+                                        "Telèfon: ${patient.telefono}",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Text(
@@ -118,7 +118,7 @@ fun RoomDetailScreen(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Text(
-                                        "Address: ${patient.direccion}",
+                                        "Adreça: ${patient.direccion}",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
 
@@ -129,7 +129,7 @@ fun RoomDetailScreen(
                                             navController.navigate("diagnosis/${patient.id}")
                                         }
                                     ) {
-                                        Text("View Diagnosis", fontSize = 16.sp)
+                                        Text("Veure Diagnòstic", fontSize = 16.sp)
                                     }
                                     Button(
                                         onClick = {
@@ -138,7 +138,7 @@ fun RoomDetailScreen(
                                             }
                                         }
                                     ) {
-                                        Text("View Care",  fontSize = 16.sp)
+                                        Text("Veure Care",  fontSize = 16.sp)
                                     }
                                 }
                             }
