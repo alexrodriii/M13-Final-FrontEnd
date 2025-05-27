@@ -37,7 +37,10 @@ class RemoteViewModel : ViewModel() {
         mutableStateOf<RemoteApiMessageBoolean>(RemoteApiMessageBoolean.Loading)
     var rooms = mutableStateListOf<Room>()
 
-    // Save in a list the image and the id of the nurse
+    var createCareState: RemoteApiMessageCare by mutableStateOf(RemoteApiMessageCare.Idle)
+        private set
+    var careDetailState: RemoteApiMessageCare by mutableStateOf(RemoteApiMessageCare.Idle) // Nuevo estado para un solo cuidado
+        private set
     private var listNurseImage = mutableStateListOf<NurseProfileImageState>()
 
 
@@ -47,6 +50,8 @@ class RemoteViewModel : ViewModel() {
         remoteApiListMessage.value = RemoteApiMessageListNurse.Loading
         remoteApiMessageBoolean.value = RemoteApiMessageBoolean.Loading
         remoteApiMessageUploadPhoto.value = RemoteApiMessageBoolean.Loading
+        createCareState = RemoteApiMessageCare.Idle
+
     }
 
     // Retrofit instance with ApiService creation for network requests
@@ -254,6 +259,31 @@ class RemoteViewModel : ViewModel() {
                 response
             )
 
+        }
+    }
+    fun createCare(patientId: Int, care: CareState) {
+        viewModelScope.launch {
+            createCareState = RemoteApiMessageCare.Loading
+
+            try {
+                val response = apiService.createCare(patientId,care)
+            Log.d("CareInfo:",response.toString())
+                createCareState = RemoteApiMessageCare.Success(response)
+            } catch (e: Exception) {
+                createCareState = RemoteApiMessageCare.Error("Error creating care: ${e.message}")
+            }
+        }
+
+    }
+    fun getCareById(careId: Int) {
+        viewModelScope.launch {
+            careDetailState = RemoteApiMessageCare.Loading
+            try {
+                val response = apiService.getCareById(careId)
+                careDetailState = RemoteApiMessageCare.Success(response)
+            } catch (e: Exception) {
+                careDetailState = RemoteApiMessageCare.Error("Error fetching care details: ${e.message}")
+            }
         }
     }
 

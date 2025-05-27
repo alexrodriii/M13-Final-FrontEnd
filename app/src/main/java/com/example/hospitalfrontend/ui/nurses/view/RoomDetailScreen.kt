@@ -127,14 +127,15 @@ fun RoomDetailScreen(
                                     Button(
                                         onClick = {
                                             navController.navigate("diagnosis/${patient.id}")
-                                        },
-                                        modifier = Modifier.align(Alignment.End)
+                                        }
                                     ) {
                                         Text("View Diagnosis", fontSize = 16.sp)
                                     }
                                     Button(
                                         onClick = {
-                                            navController.navigate("care/${patient.id}")
+                                            roomId?.let {
+                                                navController.navigate("care/${patient.id}/${roomId}")
+                                            }
                                         }
                                     ) {
                                         Text("View Care",  fontSize = 16.sp)

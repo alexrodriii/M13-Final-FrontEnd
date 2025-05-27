@@ -2,10 +2,12 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -19,13 +21,15 @@ import com.example.hospitalfrontend.network.RemoteViewModel // Importar RemoteVi
 import com.example.hospitalfrontend.network.RemoteApiMessageListCare // Importar el Sealed Class de Care
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontStyle
+import com.example.hospitalfrontend.navigation.AppScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CareView(
     navController: NavController,
     patientId: Int?,
-    remoteViewModel: RemoteViewModel = viewModel() // Inyectar RemoteViewModel
+    remoteViewModel: RemoteViewModel = viewModel(),
+    roomId: String?
 ) {
     val caresState = remoteViewModel.caresByPatient
     LaunchedEffect(patientId) {
@@ -40,11 +44,30 @@ fun CareView(
                 TopAppBar(
                     title = { Text("Care Details for Patient ID: ${patientId ?: "N/A"}") },
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Filled.ArrowBack, "Back")
+                        IconButton(onClick = {
+
+                            roomId?.let {
+                                navController.navigate("roomDetail/${roomId}") {
+
+                                    popUpTo(AppScreen.RoomDetailScreen.route) {
+                                        inclusive = true
+                                    }
+                                }
+                            } ?: navController.popBackStack()
+                        }) {
+                            Icon(Icons.Filled.ArrowBack, "Back to Room Details")
                         }
                     }
                 )
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    patientId?.let {
+                        navController.navigate("careAdd/${patientId}/${roomId}")
+                    }
+                }) {
+                    Icon(Icons.Filled.Add, "Add new care")
+                }
             }
         ) { paddingValues ->
             Column(
@@ -76,15 +99,18 @@ fun CareView(
                             ) {
                                 items(cares) { care ->
                                     Card(
-                                        modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier.fillMaxWidth().clickable { // Añadir el modificador clickable
+                                            care.id?.let {
+                                                navController.navigate("careDetail/${care.id}")
+                                            }
+                                        },
                                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer) // Color diferente para distinguir
+
                                     ) {
                                         Column(modifier = Modifier.padding(16.dp)) {
                                             Text("Care ID: ${care.id ?: "N/A"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                            Text("Pols: ${care.pols}", style = MaterialTheme.typography.bodyMedium, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                            Text("Frequencia respiratoria: ${care.freq_resp}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
-                                            Text("Temperatura: ${care.temperatura}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                                          Text("Temperatura: ${care.temperatura}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSecondaryContainer)
 
                                         }
                                     }

@@ -57,7 +57,10 @@ interface ApiService {
 
     @GET("nurse/allRoom")
     suspend fun getAllRooms(): List<Room>
-
+    @POST("nurse/care/{patientId}")
+    suspend fun createCare(@Path("patientId") id: Int,@Body care: CareState): CareState
+    @GET("nurse/care/detail/{id}")
+    suspend fun getCareById(@Path("id") careId: Int): CareState
 
 
     @Multipart
