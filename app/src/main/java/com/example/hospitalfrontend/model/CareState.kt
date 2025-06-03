@@ -9,7 +9,7 @@ data class CareState(
     val ta_sistolica: Int?, // Descripción del cuidado
     val freq_resp: Int?, // Descripción del cuidado
     val pols: Int?, // Descripción del cuidado
-    val temperatura: Int?, // Descripción del cuidado
+    val temperatura: Double?, // Descripción del cuidado
     val date: Date? = null,
     val nurse: NurseState? = null
 
