@@ -51,6 +51,7 @@ fun AddCareView(
     val freqResp = rememberSaveable { mutableStateOf("") }
     val pols = rememberSaveable { mutableStateOf("") }
     val temperatura = rememberSaveable { mutableStateOf("") }
+    val saturacioOxigen = rememberSaveable { mutableStateOf("") }
     val createCareState = remoteViewModel.createCareState
     var showSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var showErrorDialog by rememberSaveable { mutableStateOf(false) }
@@ -59,9 +60,10 @@ fun AddCareView(
     val fr = freqResp.value.toIntOrNull()
     val pulse = pols.value.toIntOrNull()
     val temp = temperatura.value.toDoubleOrNull()
+    val saturation = saturacioOxigen.value.toIntOrNull()
     var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
-    val isFormValid = remember(ta, fr, pulse, temp) {
-        ta != null && fr != null && pulse != null && temp != null
+    val isFormValid = remember(ta, fr, pulse, temp, saturation) {
+        ta != null && fr != null && pulse != null && temp != null && saturation != null
     }
 
     /*val isFormValid = remember(taSistolica.value, freqResp.value, pols.value, temperatura.value) {
@@ -170,13 +172,22 @@ fun AddCareView(
             )
             Spacer(modifier = Modifier.height(32.dp))
 
+            CareInputField(
+                valueState = saturacioOxigen,
+                labelId = "Saturació d’oxigen",
+                icon = Icons.Default.MonitorHeart,
+                placeholderText = "Saturació (%) - Normal ≥ 94%",
+                keyboardType = KeyboardType.Number
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+
 
             Button(
                 onClick = {
-                    if (isValueOutOfRange(ta, fr, pulse, temp)) {
+                    if (isValueOutOfRange(ta, fr, pulse, temp, saturation)) {
                         showConfirmationDialog = true
                     } else {
-                        submitCare(patientId, ta, fr, pulse, temp, remoteViewModel, nurseViewModel, onError = {
+                        submitCare(patientId, ta, fr, pulse, temp, saturation, remoteViewModel, nurseViewModel, onError = {
                             dialogMessage = it
                             showErrorDialog = true
                         })
@@ -230,7 +241,7 @@ fun AddCareView(
             confirmButton = {
                 TextButton(onClick = {
                     showConfirmationDialog = false
-                    submitCare(patientId, ta, fr, pulse, temp, remoteViewModel, nurseViewModel, onError = {
+                    submitCare(patientId, ta, fr, pulse, temp, saturation, remoteViewModel, nurseViewModel, onError = {
                         dialogMessage = it
                         showErrorDialog = true
                     })
@@ -274,17 +285,18 @@ fun AddCareView(
 }
 
 fun isValueOutOfRange(
-    ta: Int?, fr: Int?, pulse: Int?, temp: Double?
+    ta: Int?, fr: Int?, pulse: Int?, temp: Double?, saturation: Int?
 ): Boolean {
     return (ta != null && (ta < 90 || ta > 140)) ||
             (fr != null && (fr < 12 || fr > 20)) ||
             (pulse != null && (pulse < 50 || pulse > 100)) ||
-            (temp != null && (temp < 35.8 || temp > 38.5))
+            (temp != null && (temp < 35.8 || temp > 38.5)) ||
+            (saturation != null && saturation < 94)
 }
 
 fun submitCare(
     patientId: Int?,
-    ta: Int?, fr: Int?, pulse: Int?, temp: Double?,
+    ta: Int?, fr: Int?, pulse: Int?, temp: Double?, saturation: Int?,
     remoteViewModel: RemoteViewModel,
     nurseViewModel: NurseViewModel,
     onError: (String) -> Unit
@@ -296,7 +308,8 @@ fun submitCare(
             freq_resp = fr,
             pols = pulse,
             temperatura = temp,
-            date = null
+            date = null,
+            saturacio_oxigen = saturation,
         )
         remoteViewModel.createCare(patientId, newCare, nurseViewModel)
     } else {
