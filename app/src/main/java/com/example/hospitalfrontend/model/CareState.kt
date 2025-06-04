@@ -11,6 +11,6 @@ data class CareState(
     val pols: Int?, // Descripción del cuidado
     val temperatura: Double?, // Descripción del cuidado
     val date: Date? = null,
-    val nurse: NurseState? = null
-
+    val nurse: NurseState? = null,
+    val saturacio_oxigen: Int?
     )

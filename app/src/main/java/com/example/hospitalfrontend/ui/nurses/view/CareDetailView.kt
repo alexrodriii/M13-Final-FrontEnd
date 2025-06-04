@@ -133,6 +133,14 @@ fun CareDetailView(
                                 unit = "°C",
                                 isOutOfRange = care.temperatura?.let { it < 35.8 || it > 38.5 } ?: false
                             )
+
+                            CareDetailItem(
+                                icon = Icons.Default.MonitorHeart, // or choose another relevant icon
+                                label = "Saturació d’oxigen:",
+                                value = care.saturacio_oxigen?.toString() ?: "N/A",
+                                unit = "%",
+                                isOutOfRange = care.saturacio_oxigen?.let { it < 94 || it > 100 } ?: false
+                            )
                         }
                     }
                 }
