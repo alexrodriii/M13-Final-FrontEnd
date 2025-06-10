@@ -168,7 +168,7 @@ fun AddCareView(
                 labelId = "Temperatura",
                 placeholderText = "Temperatura(34’9ºC- 38’5ºC)",
                 icon = Icons.Default.Thermostat,
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Decimal
             )
             Spacer(modifier = Modifier.height(32.dp))
 
