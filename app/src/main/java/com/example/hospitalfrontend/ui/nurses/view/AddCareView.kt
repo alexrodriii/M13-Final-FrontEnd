@@ -57,12 +57,21 @@ fun AddCareView(
     var showSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var showErrorDialog by rememberSaveable { mutableStateOf(false) }
     var dialogMessage by rememberSaveable { mutableStateOf("") }
+    val ta = taSistolica.value.toIntOrNull()
+    val fr = freqResp.value.toIntOrNull()
+    val pulse = pols.value.toIntOrNull()
+    val temp = temperatura.value.toDoubleOrNull()
+    val saturation = saturacioOxigen.value.toIntOrNull()
+    var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    /*val isFormValid = remember(ta, fr, pulse, temp, saturation) {
+        ta != null && fr != null && pulse != null && temp != null && saturation != null
+    }*/
 
     val isFormValid = remember(taSistolica.value, freqResp.value, pols.value, temperatura.value) {
         taSistolica.value.toIntOrNull() != null &&
                 freqResp.value.toIntOrNull() != null &&
                 pols.value.toIntOrNull() != null &&
-                temperatura.value.toIntOrNull() != null &&
+                temperatura.value.toDoubleOrNull() != null &&
                 taSistolica.value.isNotEmpty() &&
                 freqResp.value.isNotEmpty() &&
                 pols.value.isNotEmpty() &&
@@ -169,7 +178,7 @@ fun AddCareView(
                 labelId = "Temperatura",
                 placeholderText = "Temperatura(34’9ºC- 38’5ºC)",
                 icon = Icons.Default.Thermostat,
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Decimal
             )
             Spacer(modifier = Modifier.height(32.dp))
             CareInputField(
@@ -182,14 +191,22 @@ fun AddCareView(
 
             Button(
                 onClick = {
-                    if (patientId != null) {
+                    if (isValueOutOfRange(ta, fr, pulse, temp, saturation)) {
+                        showConfirmationDialog = true
+                    } else {
+                        submitCare(patientId, ta, fr, pulse, temp, saturation, remoteViewModel, nurseViewModel, onError = {
+                            dialogMessage = it
+                            showErrorDialog = true
+                        })
+                    }
+                    /*if (patientId != null) {
                         val newCare = CareState(
                             id = null,
                             ta_Sistolica = taSistolica.value.toIntOrNull(),
                             ta_Distolica = taDistolica.value.toIntOrNull(),
                             freq_resp = freqResp.value.toIntOrNull(),
                             pols = pols.value.toIntOrNull(),
-                            temperatura = temperatura.value.toIntOrNull(),
+                            temperatura = temperatura.value.toDoubleOrNull(),
                             saturacio_oxigen = saturacioOxigen.value.toIntOrNull(),
                             date = null
                         )
@@ -197,7 +214,7 @@ fun AddCareView(
                     } else {
                         dialogMessage = "Falta de ID de pacient."
                         showErrorDialog = true
-                    }
+                    }*/
                 },
                 enabled = isFormValid,
                 modifier = Modifier
@@ -227,6 +244,28 @@ fun AddCareView(
         }
     }
 
+    if (showConfirmationDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showConfirmationDialog = false
+                    submitCare(patientId, ta, fr, pulse, temp, saturation, remoteViewModel, nurseViewModel, onError = {
+                        dialogMessage = it
+                        showErrorDialog = true
+                    })
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmationDialog = false }) {
+                    Text("Cancel·la")
+                }
+            },
+            title = { Text("Valors fora de rang") },
+            text = { Text("Alguns valors estan fora del rang normal. Segur que vols continuar?") }
+        )
+    }
+
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = { showSuccessDialog = false },
@@ -254,7 +293,41 @@ fun AddCareView(
     }
 }
 
-@Composable
+fun isValueOutOfRange(
+    ta: Int?, fr: Int?, pulse: Int?, temp: Double?, saturation: Int?
+): Boolean {
+    return (ta != null && (ta < 90 || ta > 140)) ||
+            (fr != null && (fr < 12 || fr > 20)) ||
+            (pulse != null && (pulse < 50 || pulse > 100)) ||
+            (temp != null && (temp < 35.8 || temp > 38.5)) ||
+            (saturation != null && saturation < 94)
+}
+
+fun submitCare(
+    patientId: Int?,
+    ta: Int?, fr: Int?, pulse: Int?, temp: Double?, saturation: Int?,
+    remoteViewModel: RemoteViewModel,
+    nurseViewModel: NurseViewModel,
+    onError: (String) -> Unit
+) {
+    if (patientId != null) {
+        val newCare = CareState(
+            id = null,
+            ta_Sistolica = ta,
+            ta_Distolica = ta,
+            freq_resp = fr,
+            pols = pulse,
+            temperatura = temp,
+            date = null,
+            saturacio_oxigen = saturation,
+        )
+        remoteViewModel.createCare(patientId, newCare, nurseViewModel)
+    } else {
+        onError("Falta de ID de pacient.")
+    }
+}
+
+/*@Composable
 fun CareInputField(
     valueState: MutableState<String>,
     labelId: String,
@@ -266,12 +339,20 @@ fun CareInputField(
     OutlinedTextField(
         value = valueState.value,
         onValueChange = { newValue ->
-            if (keyboardType == KeyboardType.Number) {
-                valueState.value = newValue.filter { it.isDigit() }
-            } else {
-                valueState.value = newValue
+            valueState.value = when (keyboardType) {
+                KeyboardType.Number -> newValue.filter { it.isDigit() }
+                KeyboardType.Decimal -> newValue.filter { it.isDigit() || it == '.' }
+                else -> newValue
             }
-        },
+        }
+                /*onValueChange = { newValue ->
+                    if (keyboardType == KeyboardType.Number) {
+                        valueState.value = newValue.filter { it.isDigit() }
+
+                    } else {
+                        valueState.value = newValue
+                    }
+                },*/
         label = { Text(text = labelId) },
         placeholder = { Text(text = placeholderText) },
         singleLine = isSingleLine,
@@ -299,7 +380,62 @@ fun CareInputField(
             fontSize = 12.sp,
         )
     }
+}*/
+
+@Composable
+fun CareInputField(
+    valueState: MutableState<String>,
+    labelId: String,
+    icon: ImageVector,
+    placeholderText: String,
+    keyboardType: KeyboardType,
+    isSingleLine: Boolean = true
+) {
+    val isInvalid = when (keyboardType) {
+        KeyboardType.Decimal -> valueState.value.toDoubleOrNull() == null
+        KeyboardType.Number -> valueState.value.toIntOrNull() == null
+        else -> valueState.value.isEmpty()
+    }
+
+    OutlinedTextField(
+        value = valueState.value,
+        onValueChange = { newValue ->
+            valueState.value = when (keyboardType) {
+                KeyboardType.Number -> newValue.filter { it.isDigit() }
+                KeyboardType.Decimal -> newValue.filter { it.isDigit() || it == '.' }
+                else -> newValue
+            }
+        },
+        label = { Text(text = labelId) },
+        placeholder = { Text(text = placeholderText) },
+        singleLine = isSingleLine,
+        leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Primary,
+            cursorColor = Primary,
+            focusedLabelColor = Primary,
+            unfocusedContainerColor = colorResource(id = R.color.white),
+            unfocusedIndicatorColor = colorResource(id = R.color.colorGray)
+        ),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType
+        ),
+        isError = isInvalid
+    )
+
+    if (isInvalid) {
+        Text(
+            text = "Introduïu un número vàlid",
+            color = Color.Red,
+            fontSize = 12.sp,
+        )
+    }
 }
+
 
 @Preview(showBackground = true)
 @Composable
