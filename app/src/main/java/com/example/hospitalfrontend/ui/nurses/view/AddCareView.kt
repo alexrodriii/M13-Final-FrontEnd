@@ -52,13 +52,22 @@ fun AddCareView(
     val freqResp = rememberSaveable { mutableStateOf("") }
     val pols = rememberSaveable { mutableStateOf("") }
     val temperatura = rememberSaveable { mutableStateOf("") }
-
+    val saturacioOxigen = rememberSaveable { mutableStateOf("") }
     val createCareState = remoteViewModel.createCareState
     var showSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var showErrorDialog by rememberSaveable { mutableStateOf(false) }
     var dialogMessage by rememberSaveable { mutableStateOf("") }
+    val ta = taSistolica.value.toIntOrNull()
+    val fr = freqResp.value.toIntOrNull()
+    val pulse = pols.value.toIntOrNull()
+    val temp = temperatura.value.toDoubleOrNull()
+    val saturation = saturacioOxigen.value.toIntOrNull()
+    var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    val isFormValid = remember(ta, fr, pulse, temp, saturation) {
+        ta != null && fr != null && pulse != null && temp != null && saturation != null
+    }
 
-    val isFormValid = remember(taSistolica.value, freqResp.value, pols.value, temperatura.value) {
+    /*val isFormValid = remember(taSistolica.value, freqResp.value, pols.value, temperatura.value) {
         taSistolica.value.toIntOrNull() != null &&
                 freqResp.value.toIntOrNull() != null &&
                 pols.value.toIntOrNull() != null &&
@@ -67,7 +76,7 @@ fun AddCareView(
                 freqResp.value.isNotEmpty() &&
                 pols.value.isNotEmpty() &&
                 temperatura.value.isNotEmpty()
-    }
+    }*/
 
     LaunchedEffect(createCareState) {
         when (createCareState) {
@@ -169,13 +178,31 @@ fun AddCareView(
                 labelId = "Temperatura",
                 placeholderText = "Temperatura(34’9ºC- 38’5ºC)",
                 icon = Icons.Default.Thermostat,
+                keyboardType = KeyboardType.Decimal
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+
+            CareInputField(
+                valueState = saturacioOxigen,
+                labelId = "Saturació d’oxigen",
+                icon = Icons.Default.MonitorHeart,
+                placeholderText = "Saturació (%) - Normal ≥ 94%",
                 keyboardType = KeyboardType.Number
             )
             Spacer(modifier = Modifier.height(32.dp))
 
+
             Button(
                 onClick = {
-                    if (patientId != null) {
+                    if (isValueOutOfRange(ta, fr, pulse, temp, saturation)) {
+                        showConfirmationDialog = true
+                    } else {
+                        submitCare(patientId, ta, fr, pulse, temp, saturation, remoteViewModel, nurseViewModel, onError = {
+                            dialogMessage = it
+                            showErrorDialog = true
+                        })
+                    }
+                    /*if (patientId != null) {
                         val newCare = CareState(
                             id = null,
                             ta_Sistolica = taSistolica.value.toIntOrNull(),
@@ -189,7 +216,7 @@ fun AddCareView(
                     } else {
                         dialogMessage = "Falta de ID de pacient."
                         showErrorDialog = true
-                    }
+                    }*/
                 },
                 enabled = isFormValid,
                 modifier = Modifier
@@ -219,6 +246,28 @@ fun AddCareView(
         }
     }
 
+    if (showConfirmationDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showConfirmationDialog = false
+                    submitCare(patientId, ta, fr, pulse, temp, saturation, remoteViewModel, nurseViewModel, onError = {
+                        dialogMessage = it
+                        showErrorDialog = true
+                    })
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmationDialog = false }) {
+                    Text("Cancel·la")
+                }
+            },
+            title = { Text("Valors fora de rang") },
+            text = { Text("Alguns valors estan fora del rang normal. Segur que vols continuar?") }
+        )
+    }
+
     if (showSuccessDialog) {
         AlertDialog(
             onDismissRequest = { showSuccessDialog = false },
@@ -245,6 +294,40 @@ fun AddCareView(
         )
     }
 }
+
+fun isValueOutOfRange(
+    ta: Int?, fr: Int?, pulse: Int?, temp: Double?, saturation: Int?
+): Boolean {
+    return (ta != null && (ta < 90 || ta > 140)) ||
+            (fr != null && (fr < 12 || fr > 20)) ||
+            (pulse != null && (pulse < 50 || pulse > 100)) ||
+            (temp != null && (temp < 35.8 || temp > 38.5)) ||
+            (saturation != null && saturation < 94)
+}
+
+fun submitCare(
+    patientId: Int?,
+    ta: Int?, fr: Int?, pulse: Int?, temp: Double?, saturation: Int?,
+    remoteViewModel: RemoteViewModel,
+    nurseViewModel: NurseViewModel,
+    onError: (String) -> Unit
+) {
+    if (patientId != null) {
+        val newCare = CareState(
+            id = null,
+            ta_sistolica = ta,
+            freq_resp = fr,
+            pols = pulse,
+            temperatura = temp,
+            date = null,
+            saturacio_oxigen = saturation,
+        )
+        remoteViewModel.createCare(patientId, newCare, nurseViewModel)
+    } else {
+        onError("Falta de ID de pacient.")
+    }
+}
+
 
 @Composable
 fun CareInputField(

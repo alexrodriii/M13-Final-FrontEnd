@@ -1,5 +1,6 @@
 package com.example.hospitalfrontend.ui.nurses.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -7,6 +8,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -100,8 +102,10 @@ fun CareDetailView(
                             CareDetailItem(
                                 icon = Icons.Default.Favorite,
                                 label = "Tensió arterial sistòlica:",
+
                                 value = care.ta_Sistolica?.toString() ?: "N/A",
-                                unit = "mmHg"
+                                unit = "mmHg",
+                                isOutOfRange = care.ta_Sistolica?.let { it !in 90..140 } ?: false
                             )
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -109,7 +113,8 @@ fun CareDetailView(
                                 icon = Icons.Default.Favorite,
                                 label = "Tensió arterial distòlica:",
                                 value = care.ta_Distolica?.toString() ?: "N/A",
-                                unit = "mmHg"
+                                unit = "mmHg",
+                                isOutOfRange = care.ta_Distolica?.let { it !in 60..90 } ?: false
                             )
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -117,7 +122,8 @@ fun CareDetailView(
                                 icon = Icons.Default.MonitorHeart,
                                 label = "Freqüència Respiratòria:",
                                 value = care.freq_resp?.toString() ?: "N/A",
-                                unit = "bpm"
+                                unit = "bpm",
+                                isOutOfRange = care.freq_resp?.let { it !in 12..20 } ?: false
                             )
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -125,7 +131,8 @@ fun CareDetailView(
                                 icon = Icons.Default.MedicalServices,
                                 label = "Pulsacions:",
                                 value = care.pols?.toString() ?: "N/A",
-                                unit = "ppm"
+                                unit = "ppm",
+                                isOutOfRange = care.pols?.let { it !in 60..100 } ?: false
                             )
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -133,7 +140,16 @@ fun CareDetailView(
                                 icon = Icons.Default.Thermostat,
                                 label = "Temperatura:",
                                 value = care.temperatura?.toString() ?: "N/A",
-                                unit = "°C"
+                                unit = "°C",
+                                isOutOfRange = care.temperatura?.let { it < 35.8 || it > 38.5 } ?: false
+                            )
+
+                            CareDetailItem(
+                                icon = Icons.Default.MonitorHeart, // or choose another relevant icon
+                                label = "Saturació d’oxigen:",
+                                value = care.saturacio_oxigen?.toString() ?: "N/A",
+                                unit = "%",
+                                isOutOfRange = care.saturacio_oxigen?.let { it < 94 || it > 100 } ?: false
                             )
                         }
                     }
@@ -154,17 +170,46 @@ fun CareDetailView(
 }
 
 @Composable
-fun CareDetailItem(icon: ImageVector, label: String, value: String, unit: String) {
+fun CareDetailItem(icon: ImageVector, label: String, value: String, unit: String, isOutOfRange: Boolean) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(if (isOutOfRange) Color(0xFFFFEBEE) else Color.Transparent)
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
-            tint = Primary, // Usar el color primario para los iconos
+            contentDescription = label,
+            tint = if (isOutOfRange) Color.Red else MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = "$value $unit",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isOutOfRange) Color.Red else Color.Unspecified
+            )
+        }
+        if (isOutOfRange) {
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = "Out of range",
+                tint = Color.Red,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+    //val valueColor = if (isOutOfRange) Color.Red else MaterialTheme.colorScheme.onSurface
+    /*Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(imageVector = icon, contentDescription = null, tint = Primary, modifier = Modifier.size(24.dp))
         Spacer(modifier = Modifier.width(12.dp))
         Column {
             Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray)
@@ -172,9 +217,29 @@ fun CareDetailItem(icon: ImageVector, label: String, value: String, unit: String
                 "$value $unit",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface
+                color = valueColor
             )
-        }
-    }
+        }*/
 }
+/*Row(
+    modifier = Modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = Primary, // Usar el color primario para los iconos
+        modifier = Modifier.size(24.dp)
+    )
+    Spacer(modifier = Modifier.width(12.dp))
+    Column {
+        Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray)
+        Text(
+            "$value $unit",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}*/
 
