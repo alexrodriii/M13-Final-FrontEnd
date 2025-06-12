@@ -100,7 +100,15 @@ fun CareDetailView(
                             CareDetailItem(
                                 icon = Icons.Default.Favorite,
                                 label = "Tensió arterial sistòlica:",
-                                value = care.ta_sistolica?.toString() ?: "N/A",
+                                value = care.ta_Sistolica?.toString() ?: "N/A",
+                                unit = "mmHg"
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            CareDetailItem(
+                                icon = Icons.Default.Favorite,
+                                label = "Tensió arterial distòlica:",
+                                value = care.ta_Distolica?.toString() ?: "N/A",
                                 unit = "mmHg"
                             )
                             Spacer(modifier = Modifier.height(10.dp))

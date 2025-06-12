@@ -5,11 +5,12 @@ import java.time.*
 import java.util.Date
 
 data class CareState(
-    val id: Int?, // Id del cuidado. Anulable para robustez
-    val ta_sistolica: Int?, // Descripción del cuidado
-    val freq_resp: Int?, // Descripción del cuidado
-    val pols: Int?, // Descripción del cuidado
-    val temperatura: Int?, // Descripción del cuidado
+    val id: Int?,
+    val ta_Sistolica: Int?,
+    val ta_Distolica: Int?,
+    val freq_resp: Int?,
+    val pols: Int?,
+    val temperatura: Int?,
     val date: Date? = null,
     val nurse: NurseState? = null
 

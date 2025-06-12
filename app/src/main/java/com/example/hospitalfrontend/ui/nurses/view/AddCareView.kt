@@ -48,6 +48,7 @@ fun AddCareView(
 
 ) {
     val taSistolica = rememberSaveable { mutableStateOf("") }
+    val taDistolica = rememberSaveable { mutableStateOf("") }
     val freqResp = rememberSaveable { mutableStateOf("") }
     val pols = rememberSaveable { mutableStateOf("") }
     val temperatura = rememberSaveable { mutableStateOf("") }
@@ -137,6 +138,15 @@ fun AddCareView(
             Spacer(modifier = Modifier.height(16.dp))
 
             CareInputField(
+                valueState = taDistolica,
+                labelId = "Tensió Arterial Distòlica",
+                icon = Icons.Default.HealthAndSafety,
+                placeholderText = "Tensió Distòlica (50-90 mmHg)",
+                keyboardType = KeyboardType.Number
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CareInputField(
                 valueState = freqResp,
                 labelId = "Freqüència Respiratòria",
                 placeholderText = "Freqüència Respiratòria (12x’- 20x’)",
@@ -168,7 +178,8 @@ fun AddCareView(
                     if (patientId != null) {
                         val newCare = CareState(
                             id = null,
-                            ta_sistolica = taSistolica.value.toIntOrNull(),
+                            ta_Sistolica = taSistolica.value.toIntOrNull(),
+                            ta_Distolica = taDistolica.value.toIntOrNull(),
                             freq_resp = freqResp.value.toIntOrNull(),
                             pols = pols.value.toIntOrNull(),
                             temperatura = temperatura.value.toIntOrNull(),
