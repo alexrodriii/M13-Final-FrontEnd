@@ -11,7 +11,7 @@ data class CareState(
     val ta_Distolica: Int?,
     val freq_resp: Int?,
     val pols: Int?,
-    val temperatura: Int?,
+    val temperatura: Double?,
     val date: Date? = null,
     val nurse: NurseState? = null,
     val saturacio_oxigen: Int?
