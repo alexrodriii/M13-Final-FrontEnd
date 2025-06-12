@@ -102,9 +102,19 @@ fun CareDetailView(
                             CareDetailItem(
                                 icon = Icons.Default.Favorite,
                                 label = "Tensió arterial sistòlica:",
-                                value = care.ta_sistolica?.toString() ?: "N/A",
+
+                                value = care.ta_Sistolica?.toString() ?: "N/A",
                                 unit = "mmHg",
-                                isOutOfRange = care.ta_sistolica?.let { it !in 90..140 } ?: false
+                                isOutOfRange = care.ta_Sistolica?.let { it !in 90..140 } ?: false
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            CareDetailItem(
+                                icon = Icons.Default.Favorite,
+                                label = "Tensió arterial distòlica:",
+                                value = care.ta_Distolica?.toString() ?: "N/A",
+                                unit = "mmHg",
+                                isOutOfRange = care.ta_Distolica?.let { it !in 60..90 } ?: false
                             )
                             Spacer(modifier = Modifier.height(10.dp))
 
@@ -161,39 +171,39 @@ fun CareDetailView(
 
 @Composable
 fun CareDetailItem(icon: ImageVector, label: String, value: String, unit: String, isOutOfRange: Boolean) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .background(if (isOutOfRange) Color(0xFFFFEBEE) else Color.Transparent)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = if (isOutOfRange) Color.Red else MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(if (isOutOfRange) Color(0xFFFFEBEE) else Color.Transparent)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = if (isOutOfRange) Color.Red else MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = "$value $unit",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isOutOfRange) Color.Red else Color.Unspecified
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(text = label, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = "$value $unit",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (isOutOfRange) Color.Red else Color.Unspecified
-                )
-            }
-            if (isOutOfRange) {
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = "Out of range",
-                    tint = Color.Red,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
         }
+        if (isOutOfRange) {
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = "Out of range",
+                tint = Color.Red,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
     //val valueColor = if (isOutOfRange) Color.Red else MaterialTheme.colorScheme.onSurface
     /*Row(
         modifier = Modifier.fillMaxWidth(),
@@ -210,26 +220,26 @@ fun CareDetailItem(icon: ImageVector, label: String, value: String, unit: String
                 color = valueColor
             )
         }*/
-    }
-    /*Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Primary, // Usar el color primario para los iconos
-            modifier = Modifier.size(24.dp)
+}
+/*Row(
+    modifier = Modifier.fillMaxWidth(),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = Primary, // Usar el color primario para los iconos
+        modifier = Modifier.size(24.dp)
+    )
+    Spacer(modifier = Modifier.width(12.dp))
+    Column {
+        Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray)
+        Text(
+            "$value $unit",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray)
-            Text(
-                "$value $unit",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }*/
+    }
+}*/
 
